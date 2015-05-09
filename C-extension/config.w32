@@ -1,0 +1,13 @@
+// $Id$
+// vim:ft=javascript
+
+// If your extension references something external, use ARG_WITH
+// ARG_WITH("alsqlp", "for alsqlp support", "no");
+
+// Otherwise, use ARG_ENABLE
+// ARG_ENABLE("alsqlp", "enable alsqlp support", "no");
+
+if (PHP_ALSQLP != "no") {
+	EXTENSION("alsqlp", "alsqlp.c");
+}
+

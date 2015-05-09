@@ -1,0 +1,16 @@
+#!/bin/sh -x
+
+PHP_AUTOCONF=/usr/local/www/autoconf/bin/autoconf
+export PHP_AUTOCONF
+
+PHP_AUTOHEADER=/usr/local/www/autoconf/bin/autoheader
+export PHP_AUTOHEADER
+
+/usr/local/www/php/bin/phpize
+./configure --with-alsqlp=shared --with-php-config=/usr/local/www/php/bin/php-config
+
+#/usr/local/bison-2.1/bin/bison -v -t -d sql.y                
+bison -v -t -d sql.y
+flex -i sql.l # -d -p               
+
+make clean; make; make install; /usr/local/www/httpd/bin/./apachectl restart

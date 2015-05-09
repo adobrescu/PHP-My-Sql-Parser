@@ -1,0 +1,17 @@
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
+!CREDITS
+!README.txt
+!alsqlp.c
+!alsqlp.php
+!build_alsqlp
+!config.m4
+!config.w32
+!parse_tree.c
+!parse_tree.h
+!php_alsqlp.h
+!sql.l
+!sql.y
+!sql_defs.h
