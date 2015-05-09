@@ -21,7 +21,7 @@ const TOKEN_TYPE_OPERATOR='P';
 
 class SqlParser
 {
-	public static $___useCached=true;
+	public static $___useCached=false;
 	protected $tokens, $parseTree;
 	
 	public static $___keywords=array('ACCESSIBLE', 'ADD', 'ALL', 'ALTER', 'ANALYZE', 'AND', 'AS', 'ASC', 'ASENSITIVE', 'BEFORE', 'BETWEEN', 'BIGINT', 'BINARY', 'BLOB', 'BOTH', 'BY', 'CALL', 'CASCADE', 'CASE', 'CHANGE', 'CHAR', 'CHARACTER', 'CHECK', 'COLLATE', 'COLUMN', 'CONDITION', 'CONSTRAINT', 'CONTINUE', 'CONVERT', 'CREATE', 'CROSS', 'CURRENT_DATE', 'CURRENT_TIME', 'CURRENT_TIMESTAMP', 'CURRENT_USER', 'CURSOR', 'DATABASE', 'DATABASES', 'DAY_HOUR', 'DAY_MICROSECOND', 'DAY_MINUTE', 'DAY_SECOND', 'DEC', 'DECIMAL', 'DECLARE', 'DEFAULT', 'DELAYED', 'DELETE', 'DESC', 'DESCRIBE', 'DETERMINISTIC', 'DISTINCT', 'DISTINCTROW', 'DIV', 'DOUBLE', 'DROP', 'DUAL', 'EACH', 'ELSE', 'ELSEIF', 'ENCLOSED', 'ESCAPED', 'EXISTS', 'EXIT', 'EXPLAIN', 'FALSE', 'FETCH', 'FLOAT', 'FLOAT4', 'FLOAT8', 'FOR', 'FORCE', 'FOREIGN', 'FROM', 'FULLTEXT', 'GET', 'GRANT', 'GROUP', 'HAVING', 'HIGH_PRIORITY', 'HOUR_MICROSECOND', 'HOUR_MINUTE', 'HOUR_SECOND', 'IF', 'IGNORE', 'IN', 'INDEX', 'INFILE', 'INNER', 'INOUT', 'INSENSITIVE', 'INSERT', 'INT', 'INT1', 'INT2', 'INT3', 'INT4', 'INT8', 'INTEGER', 'INTERVAL', 'INTO', 'IO_AFTER_GTIDS', 'IO_BEFORE_GTIDS', 'IS', 'ITERATE', 'JOIN', 'KEY', 'KEYS', 'KILL', 'LEADING', 'LEAVE', 'LEFT', 'LIKE', 'LIMIT', 'LINEAR', 'LINES', 'LOAD', 'LOCALTIME', 'LOCALTIMESTAMP', 'LOCK', 'LONG', 'LONGBLOB', 'LONGTEXT', 'LOOP', 'LOW_PRIORITY', 'MASTER_BIND', 'MASTER_SSL_VERIFY_SERVER_CERT', 'MATCH', 'MAXVALUE', 'MEDIUMBLOB', 'MEDIUMINT', 'MEDIUMTEXT', 'MIDDLEINT	MINUTE_MICROSECOND', 'MINUTE_SECOND', 'MOD', 'MODIFIES', 'NATURAL', 'NOT', 'NO_WRITE_TO_BINLOG', 'NULL', 'NUMERIC', 'ON', 'OPTIMIZE', 'OPTION', 'OPTIONALLY', 'OR', 'ORDER', 'OUT', 'OUTER', 'OUTFILE', 'PARTITION', 'PRECISION', 'PRIMARY', 'PROCEDURE', 'PURGE', 'RANGE', 'READ', 'READS', 'READ_WRITE', 'REAL', 'REFERENCES', 'REGEXP', 'RELEASE', 'RENAME', 'REPEAT', 'REPLACE', 'REQUIRE', 'RESIGNAL', 'RESTRICT', 'RETURN', 'REVOKE', 'RIGHT', 'RLIKE', 'SCHEMA', 'SCHEMAS', 'SECOND_MICROSECOND', 'SELECT', 'SENSITIVE', 'SEPARATOR', 'SET', 'SHOW', 'SIGNAL', 'SMALLINT', 'SPATIAL', 'SPECIFIC', 'SQL', 'SQLEXCEPTION', 'SQLSTATE', 'SQLWARNING', 'SQL_BIG_RESULT', 'SQL_CALC_FOUND_ROWS', 'SQL_SMALL_RESULT', 'SSL', 'STARTING', 'STRAIGHT_JOIN', 'TABLE', 'TERMINATED', 'THEN', 'TINYBLOB', 'TINYINT', 'TINYTEXT', 'TO', 'TRAILING', 'TRIGGER', 'TRUE', 'UNDO', 'UNION', 'UNIQUE', 'UNLOCK', 'UNSIGNED', 'UPDATE', 'USAGE', 'USE', 'USING', 'UTC_DATE', 'UTC_TIME', 'UTC_TIMESTAMP', 'VALUES', 'VARBINARY', 'VARCHAR', 'VARCHARACTER', 'VARYING', 'WHEN', 'WHERE', 'WHILE', 'WITH', 'WRITE', 'XOR', 'YEAR_MONTH', 'ZEROFILL'		);
@@ -77,26 +77,26 @@ class SqlParser
 		print_r(parseSqlQuery(')'.$sqlExpression));
 	}
 	
-	public function parse($source, $debug=true)
+	public function parse($source, $tokensStartIndex=10)
 	{
 		
 		if(static::$___useCached || !extension_loaded('alsqlp'))
 		{
-			$this->tokens=$this->parseTokens($source);
+			$this->parseTokens($source);
 			
 			$cacheFileName=$this->getGetCacheFileName($source);
-		
+			
 			if(file_exists($cacheFileName))
 			{
 				include($cacheFileName);
-				$this->parseTree=$parseTree;//$parseTree is set in the included file
 				return;
 			}
+			
 		}
 		
 		if(extension_loaded('alsqlp'))
 		{
-			if(is_array($sourceStruct=parseSqlQuery($source)))
+			if(is_array($sourceStruct=parseSqlQuery($source, $tokensStartIndex)))
 			{
 				if (!static::$___useCached)
 				{
@@ -112,10 +112,7 @@ class SqlParser
 			
 			if(static::$___useCached)
 			{
-				$fp=fopen($cacheFileName, 'w');
-				fputs($fp, '<?php'."\n".'$parseTree='.var_export($this->parseTree, true).';');
-				
-				fclose($fp);
+				file_put_contents($cacheFileName, '<?php'."\n".'$this->parseTree='.var_export($this->parseTree, true).';');
 			}
 		}
 	}
@@ -238,7 +235,7 @@ class SqlParser
 	public function parseTokens($source, $debug=false)
 	{
 		
-		$tokens=array();
+		$this->tokens=array();
 		
 		if(!static::$___regexpTokens)
 		{
@@ -268,12 +265,12 @@ class SqlParser
 				}
 				
 				
-				$tokens[]=array(0=>$match,1=>$numericTokenType);
+				$this->tokens[]=array(0=>$match,1=>$numericTokenType);
 				
 			}
 		}
 		
-		return $tokens;
+		return $this->tokens;
 	}
 	
 	
@@ -367,8 +364,8 @@ class SqlParser
 	}
 	public function insertSource($toTokenType, $toTokenName, $source, $operator, $replace, $encloseWithParanthesis, &$startNode=null)
 	{
-
 		$numTokens=count($this->tokens);
+		$numTokens=max(array_keys($this->tokens))+1;
 		$tokenNode=&$this->getTokenParseTreeNode($toTokenType, $startNode);
 		
 		
