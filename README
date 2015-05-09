@@ -1,0 +1,87 @@
+1. What is ALSQLP
+2. Why it might be usefull
+3. How to install it
+4. How it works
+
+
+1. What is ALSQLP
+-----------------
+
+ALSQLP is a little (My)SQL parser built for modifying MySQL queries.
+
+Given a SELECT, INSERT, UPDATE, REPLACE or DELETE statement, it breaks the SQL command into pieces (tokens)
+and adds them to a tree. This tree structure can be modified and, by reversing the process, a new query can be built.
+
+ALSQP has 2 components: a PHP extension written in C and a PHP class.
+
+Both components must be installed in the development environment where a php extension can be installed.
+
+In a production environment it may use only the pure PHP code.
+
+
+2. Why it might be usefull
+--------------------------
+
+ALSQP can be used for adding/appending WHERE clauses, ORDER BY, LIMIT etc.
+
+Also I think it might be used for a simple record level permissions functionality. In a system with users and groups,
+each record may have a "owner ID" column and 3 bitmask columns showing the permissions the owner, the groups she belongs to and the other users have on the record.
+Then, on every SQL query, the parser could add the apropriate boolean conditions to the WHERE clauses. The resulting query might look something like:
+
+--some query
+SELECT *
+FROM ...
+WHERE conditions
+	--start permissions conditions
+	AND (
+		(id_owner=$id_owner AND (owner_permissions & $required_permissions) )
+		OR
+		(id_group IN $list_of_groups_the_owner_belongs_to AND (groups_permissions & $required_permissions) )
+		OR
+		(others_permissions & $required_permissions)
+		)
+
+3.  How to install it
+---------------------
+
+The PHP class can be stored anywhere, it is just a PHP class.
+	
+To compile the extension, bison (http://www.gnu.org/software/bison/) and flex (http://flex.sourceforge.net/) must be installed. 
+There are distributions of these for both Unix and Windows systems.
+
+	
+	
+To build the extension, the steps are as for any other extension with one extra step (where bison and flex generate some files).
+Assuming that all executable needed are in the path, in ALSQP  C extension directory run the following:
+
+cd C-extension
+phpize 
+./configure --with-alsqlp=shared
+
+bison -v -t -d sql.y
+flex -i sql.l 
+
+make
+make install
+apachectl restart
+
+The script build_alsqlp has the above commands with the full paths.
+
+Then add to php.ini, in "Dynamic Extensions" section:
+
+extension=alsqlp.so
+
+4.  How it works
+----------------
+
+In a nutshell:
+
+- SqlParser PHP class has a method called  "parse"; 
+- When called with a query as parameter, it checks if alsqlp extension is installed;
+- If installed, it calls parseSqlQuery which is exported by the extension and which returns a tree (an associative array). These tree is saved on the disk 
+in a cache dir. It will be used in environments where alsqp extension is not installed;
+- If the extension is not installed, based on the query, it identifies the coresponding cache file and loads the tree (the associative array) from the disk;
+- Once loaded (from alsqp extension or from the disk) the tree can be manipulated to obtain new queries;
+	
+	
+	
