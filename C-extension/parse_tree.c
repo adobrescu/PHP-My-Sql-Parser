@@ -10,7 +10,7 @@
 zval *tokensList;
 int token_num=0;
 
-int parse_sql_query(char *pSqlQuery, zval*return_value)
+int parse_sql_query(char *pSqlQuery, int tokens_start_index, zval*return_value)
 {
     zval *parse_tree, *tokens;
     
@@ -29,7 +29,7 @@ int parse_sql_query(char *pSqlQuery, zval*return_value)
 	//add_assoc_zval(return_value, "parse_tree", parse_tree);
 	add_assoc_zval(return_value, "tokens", tokens);
     
-	token_num=0;
+	token_num=tokens_start_index;
 	tokensList=tokens;
 	
 	/* parse */
@@ -158,11 +158,15 @@ int make_token( YYSTYPE *token, char*string, int bison_token_type, int is_var )
 	//add_next_index_long(z_token, token_num );
 	add_next_index_long(z_token, is_var );
 	
-	add_next_index_zval(tokensList, z_token );
+	//add_next_index_zval(tokensList, z_token );
+	add_index_zval(tokensList, token_num, z_token);
 	//add_next_index_string(tokensList, string, 1 );
 		
 	MAKE_STD_ZVAL((*token).token_index);
 	ZVAL_LONG((*token).token_index, token_num);
+
+
+
 	/*
 	MAKE_STD_ZVAL((*token).token_index);
 	array_init((*token).token_index); ///

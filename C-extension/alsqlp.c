@@ -228,11 +228,12 @@ PHP_FUNCTION(parseSqlQuery)
 	zval **function_name;
 	zval *retval;
 	int sql_query_len;
+	int tokens_start_index;
 	
-	if (zend_parse_parameters(argc TSRMLS_CC, "s", &sql_query, &sql_query_len) == FAILURE) 
+	if (zend_parse_parameters(argc TSRMLS_CC, "sl", &sql_query, &sql_query_len, &tokens_start_index) == FAILURE) 
 		return;
 	
-	parse_sql_query(sql_query, return_value );
+	parse_sql_query(sql_query, tokens_start_index, return_value );
 	
 	
 }
