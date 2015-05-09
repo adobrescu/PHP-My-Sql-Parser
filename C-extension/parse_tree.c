@@ -148,11 +148,7 @@ int make_token( YYSTYPE *token, char*string, int bison_token_type, int is_var )
 {	
 	zval *z_token;
 	
-	if(token_num==0 && *string==')')
-	{
-		zend_printf("AICI:%s", string);
-		return bison_token_type;
-	}
+	
 
     MAKE_STD_ZVAL(z_token); 
 	array_init(z_token);
