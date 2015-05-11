@@ -24,7 +24,9 @@ function testQuery($query)
 	
 	//////////////////////
 	
-	if (strtoupper($tokens[0][0])!='SELECT')
+	$firstToken=reset($tokens);
+		
+	if (strtoupper($firstToken[0])!='SELECT')
 	{
 		return;
 	}
@@ -39,6 +41,7 @@ function testQuery($query)
 	$assertParser->parse($rebuiltQuery);
 
 	ASSERT_IDENTICAL($parser->getTokens(), $assertParser->getTokens());
+	ASSERT_IDENTICAL($parser->getParseTree(), $assertParser->getParseTree());
 
 
 	if(strpos($query, '/*')===false)
