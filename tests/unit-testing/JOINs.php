@@ -65,43 +65,51 @@ foreach($selectTypes as $selectType)
 {
 	foreach($joinTypes as $joinType)
 	{
-		$joinType2=$joinTypes[rand(0, $numJoinTypes-1)];
-		$joinType3=$joinTypes[rand(0, $numJoinTypes-1)];
-		$joinType4=$joinTypes[rand(0, $numJoinTypes-1)];
-
-		foreach($intoTypes as $intoType)
+		//foreach($joinTypes as $joinType2)
 		{
+			//foreach($joinTypes as $joinType3)
+			{
+				//foreach($joinTypes as $joinType4)
+				{
+					//$joinType2=$joinTypes[rand(0, $numJoinTypes-1)];
+					//$joinType3=$joinTypes[rand(0, $numJoinTypes-1)];
+					//$joinType4=$joinTypes[rand(0, $numJoinTypes-1)];
 
-			$query='SELECT fld 
-				FROM tbl1 '.$joinType.'
-					tbl2 USING(id)  
-				'.$joinType2.' `db`.`table` 
-					ON `db`.`table`.`column`=tbl2.field12  '.
-				$joinType3.' db.tbl
-					USING(db)		'.
-				$joinType4.' `where` 
-					on db.tbl.camp=`where`.`orderby`'.
-				'WHERE (tbl.id+(tbl2.camp-`db`.`table`.`column`))>=0
-				GROUP BY `db`.`table`.`column` DESC, func(tbl2.camp) ASC
-				HAVING MAX ( `db`.`table`.`column` = 10 )
-				ORDER BY `select`.`from`.`having`, `procedure` ASC, db.tbl.`columns` ASC, 2 DESc
-				LIMIT 10, 100
-				PRoceDURE proc(a+b, (select \'abced\\\'efgh\'))
-				';
+					foreach($intoTypes as $intoType)
+					{
+
+						$query='SELECT fld 
+							FROM tbl1 '.$joinType.'
+								tbl2 USING(id)  
+							'.$joinType.' `db`.`table` 
+								ON `db`.`table`.`column`=tbl2.field12  '.
+							$joinType.' db.tbl
+								USING(db)		'.
+							$joinType.' `where` 
+								on db.tbl.camp=`where`.`orderby`'.
+							'WHERE (tbl.id+(tbl2.camp-`db`.`table`.`column`))>=0
+							GROUP BY `db`.`table`.`column` DESC, func(tbl2.camp) ASC
+							HAVING MAX ( `db`.`table`.`column` = 10 )
+							ORDER BY `select`.`from`.`having`, `procedure` ASC, db.tbl.`columns` ASC, 2 DESc
+							LIMIT 10, 100
+							PRoceDURE proc(a+b, (select \'abced\\\'efgh\'))
+							';
 
 
-			$query .= ($intoType?$intoType.' \'filename\'':'').' ';
-				
-			
-			
-			$query .= $selectType;
-			
-			 //print_r(parseSqlQuery($query)); die('');
-			 
-			
-			testQuery($query);
+						$query .= ($intoType?$intoType.' \'filename\'':'').' ';
+
+
+
+						$query .= $selectType;
+
+						 //print_r(parseSqlQuery($query)); die('');
+
+
+						testQuery($query);
+					}
+				}
+			}
 		}
-		
 
 	}
 	
