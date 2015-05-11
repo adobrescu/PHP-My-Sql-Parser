@@ -296,8 +296,7 @@ extern char *yytext;
 %%
 
 statement:
-	expression { zend_printf("DAXXA"); eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 1, &$1); add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
-	| statement_union {eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_UNION, 1, &$1);  add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
+	statement_union {eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_UNION, 1, &$1);  add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
 	| statement_select { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_SELECT, 1, &$1); add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
 	| statement_update { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_UPDATE, 1, &$1); add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
 	| statement_delete { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_DELETE, 1, &$1); add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
