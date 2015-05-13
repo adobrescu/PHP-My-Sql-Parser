@@ -51,7 +51,10 @@ function testSELECTQueries($selectExprs, $tblReferences, $wheres, $groupBys)
 						$parser->appendWhere($appendWhere, 'AND');
 						$rebuiltQuery=$parser->rebuildSource();
 						
-						ASSERT_EQUALS(preg_replace('/[\s]+/', '', 'seLect '.$selectExprList.($tblReference?' FROM '.$tblReference:'').' WHERE ('.$appendWhere.')'), preg_replace('/[\s]+/', '', $rebuiltQuery));
+						if(!ASSERT_EQUALS(preg_replace('/[\s]+/', '', 'seLect '.$selectExprList.($tblReference?' FROM '.$tblReference:'').' WHERE ('.$appendWhere.')'), preg_replace('/[\s]+/', '', $rebuiltQuery)))
+						{
+							//die(preg_replace('/[\s]+/', '', 'seLect '.$selectExprList.($tblReference?' FROM '.$tblReference:'').' WHERE ('.$appendWhere.')').'<br>'.$rebuiltQuery);
+						}
 						
 						 /////
 						

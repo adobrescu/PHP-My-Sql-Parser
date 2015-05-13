@@ -71,13 +71,8 @@ class SqlParser
 		
 		$cacheFileName.='/'.$cacheFileNameParts[$numCacheFilenNameParts-1].'.php';
 		return $cacheFileName;
-	}
-	public function parseExpression($sqlExpression)
-	{
-		print_r(parseSqlQuery(')'.$sqlExpression));
-	}
-	
-	public function parse($source, $tokensStartIndex=10)
+	}	
+	public function parse($source, $tokensStartIndex=0)
 	{
 		
 		if(static::$___useCached || !extension_loaded('alsqlp'))
@@ -130,13 +125,13 @@ class SqlParser
 		return $this->parseTree;
 	}
 	
-	public function rebuildSource($inserts=null)
+	public function rebuildSource($inserts=null, &$startNode=null, $skipNumTokens=0)
 	{
-		return $this->rebuildSourceWithRecursiveCalls($null, $inserts);
-		
+		return $this->rebuildSourceWithRecursiveCalls($startNode, $inserts, $skipNumTokens);
 	}
-	public function rebuildSourceWithRecursiveCalls(&$node=null, $inserts=null)
+	public function rebuildSourceWithRecursiveCalls(&$node=null, $inserts=null, $skipNumTokens=0)
 	{
+		//print_r($this->tokens); exit();
 		if (is_null($node))
 		{
 			if(!$this->parseTree)
@@ -160,13 +155,23 @@ class SqlParser
 					}
 				}
 			}
-			return ($this->tokens[$node][1]!=TOKEN_TYPE_OPERATOR?' ':' ').$this->tokens[$node][0].$source;
+			return ($this->tokens[$node][0]!='('?' ':'').$this->tokens[$node][0].$source;
 		}
 		
+		$numTokens=0;
 		
-		
-		foreach($node as $childTokenType=>$childNode)
+		foreach($node['child_nodes'] as $childTokenType=>$childNode)
 		{
+			if($childTokenType==0 || $childTokenType=='type')
+			{
+				//continue;
+			}
+			if($numTokens<$skipNumTokens)
+			{
+				$numTokens++;
+				continue;
+			}
+			
 			if(isset($inserts['token_type']))
 			{
 				//foreach($inserts as $insert)
@@ -232,7 +237,7 @@ class SqlParser
 		}
 	}
 	
-	public function parseTokens($source, $debug=false)
+	public function parseTokens($source)
 	{
 		
 		$this->tokens=array();
@@ -244,10 +249,6 @@ class SqlParser
 		
 		if(preg_match_all('/'.static::$___regexpTokens.'/is', $source, $matches, PREG_PATTERN_ORDER)>0)
 		{
-			if($debug)
-			{
-				print_r($matches); exit();
-			}
 			foreach($matches[1] as $i=>$match)
 			{
 				$numericTokenType=TOKEN_TYPE_STRING; //string
@@ -300,15 +301,16 @@ class SqlParser
 		{
 			$startNode=&$this->parseTree;
 		}
-		foreach($startNode as $tokenType=>&$tokenNode)
+		foreach($startNode['child_nodes'] as &$childNode)
 		{
-			if(substr($tokenType,0,5)==$findTokenType)
+			//if(substr($tokenType,0,5)==$findTokenType)
+			if($childNode['type']==$findTokenType)
 			{
 				return $tokenNode;
 			}
 		}
 		//echo 'bla '.$b;
-		foreach($startNode as $tokenType=>&$tokenNode)
+		foreach($startNode['child_nodes'] as $tokenType=>&$tokenNode)
 		{
 			//echo 'axxa'; 
 			if(!is_null($childTokenNode=&$this->getTokenParseTreeNode($findTokenType, $tokenNode)))
@@ -348,12 +350,16 @@ class SqlParser
 			return;
 		}
 		
-		foreach($startNode as $childNodeType=>&$childNode)
+		foreach($startNode['child_nodes'] as $childNodeType=>&$childNode)
 		{
-			if(substr($childNodeType,0,5)==$findTokenType)
+			if($childNode['type']==$findTokenType)
 			{
 				$nodes[]=&$childNode;
 			}
+		}
+		
+		foreach($startNode['child_nodes'] as $childNodeType=>&$childNode)
+		{
 			$this->getNodesByType($findTokenType, $childNode, $nodes);
 		}
 		
@@ -362,9 +368,142 @@ class SqlParser
 			return $nodes;
 		}
 	}
+	
+	const INSERT_REPLACE=1;
+	const INSERT_PREPEND=2;
+	const INSERT_APPEND=3;
+	
+	
+	public function createNode(&$exprNode, $offset, $tokenIndex)
+	{
+		$key=array_keys($exprNode)[$offset];
+		$args=func_get_args();
+		
+		for($i=3; $i<count($args); $i++)
+		{
+			//print_r($args[$i]);
+			//echo '<hr>';
+			if(is_array($args[$i]))
+			{
+				$childNodeKey=key($args[$i]);
+				$newNode[$childNodeKey]=current($args[$i]);
+			}
+			else
+			{
+				$this->tokens[$tokenIndex]=array( 0=>$args[$i]);
+				$newNode[]=$tokenIndex;
+				$tokenIndex++;	
+			}
+		}
+		
+		//$this->tokens[$tokenIndex]=array(0=>$prependToken);
+		//$this->tokens[$tokenIndex+1]=array(0=>$appendToken);
+		
+		
+		
+		
+		/*$newNode=array(
+			array( 0=> $tokenIndex),
+			static::PHP_SQL_EXPR.'-0' => $exprNode[$key],		
+			array( 0=> $tokenIndex+1)
+		);
+		 * 
+		 */
+		$exprNode[$key]=$newNode;
+		
+		return $tokenIndex;
+	}
+	
 	public function insertSource($toTokenType, $toTokenName, $source, $operator, $replace, $encloseWithParanthesis, &$startNode=null)
 	{
-		$numTokens=count($this->tokens);
+		$numTokens=$this->getTokenMaxIndex()+1;
+		
+		$exprParser=new SqlParser();
+		$exprParser->parse($source, $numTokens+5);
+		
+		$exprParseTree=$exprParser->parseTree;
+		$exprTokens=$exprParser->tokens;
+		unset($exprTokens[$numTokens+5]);
+		
+		$toTokenNodes=$this->getNodesByType($exprParser->parseTree['type']);
+		
+		if(!$toTokenNodes[0]['child_nodes'] || $replace)
+		{
+			$toTokenNodes[0]=$exprParser->parseTree;
+			
+			foreach($exprParser->tokens as $tokenIndex=>$token)
+			{
+				$this->tokens[$tokenIndex]=$token;
+			}
+		}
+		elseif(!$encloseWithParanthesis)
+		{
+			$this->tokens[$numTokens]=array(0=>$operator);
+			
+			foreach($exprParser->tokens as $tokenIndex=>$token)
+			{
+				$this->tokens[$tokenIndex]=$token;
+			}
+			
+			$toTokenNodes[0]['child_nodes'][]=$numTokens;
+			$i=0;
+			foreach($exprParser->parseTree['child_nodes'] as $exprChildNode)
+			{
+				if($i==0)
+				{
+					$i++;
+					continue;
+				}
+				$toTokenNodes[0]['child_nodes'][]=$exprChildNode;
+			}
+		}
+		else
+		{
+			
+			$this->tokens[$numTokens]=array(0=>'(');
+			$this->tokens[$numTokens+1]=array(0=>')');
+			$this->tokens[$numTokens+2]=array(0=>$operator);
+			$this->tokens[$numTokens+3]=array(0=>'(');
+			$this->tokens[$numTokens+4]=array(0=>')');
+			foreach($exprParser->tokens as $tokenIndex=>$token)
+			{
+				$this->tokens[$tokenIndex]=$token;
+			}
+			$toTokenNodes[0]['child_nodes'][1]=array(
+					'type' => static::PHP_SQL_EXPR,
+					'child_nodes' => array(
+							0 => array(
+									'type' => static::PHP_SQL_EXPR,
+									'child_nodes' => array(
+										0 => $numTokens,
+										1 => $toTokenNodes[0]['child_nodes'][1],
+										2 => $numTokens+1
+														)
+								),
+							1 => $numTokens+2,
+							2 => array(
+									'type' => static::PHP_SQL_EXPR,
+									'child_nodes' => array (
+										0=>$numTokens+3,
+										1=>$exprParseTree['child_nodes'][1],
+										2=>$numTokens+4
+									)
+								)
+						)
+				);
+			
+			//print_r($toTokenNodes[0]);die();
+			
+			//$this->tokens[$numTokens+1]=$this->tokens[$numTokens+4]=array(0=>')');
+			//print_r($this->tokens); die();
+		}
+	}
+	public function getTokenMaxIndex()
+	{
+		return max(array_keys($this->tokens));
+	}
+	public function insertSource2($toTokenType, $toTokenName, $source, $operator, $replace, $encloseWithParanthesis, &$startNode=null)
+	{
 		$numTokens=max(array_keys($this->tokens))+1;
 		$tokenNode=&$this->getTokenParseTreeNode($toTokenType, $startNode);
 		
@@ -395,6 +534,8 @@ class SqlParser
 	}
 	public function appendWhere($cond, $operator=null, $startNode=null)
 	{
+		$cond='WHERE '.$cond;
+		//die('WHERE '.$cond);
 		$this->insertSource(static::PHP_SQL_WHERE, 'WHERE', $cond, $operator, $replace=false, $encloseWithParanthesis=true, $startNode);
 	}
 	public function appendOrderBy($orderBy)

@@ -5,6 +5,8 @@
 	 echo '<pre>';
 	 include_once(__DIR__.'/lib/SqlParser.class.php');
 	 
+	 define('CACHE_DIR', __DIR__.'/../tests/cache');
+	 
 	 $query='SELECT customers.*, users.email
 			FROM customers LEFT JOIN users
 				USING(id_user)

@@ -57,26 +57,34 @@ int eval_rule(YYSTYPE*subtree, int options, int token_type, int num_args, ...)
 	int i, j;
 	YYSTYPE *node;
 	zval *empty_token;
+	zval *child_nodes;
 	char key[20], key_num;
 	
 	/**
 	* - all the args after num_args are added in an array;
 	* - these array is initialised in subtree->token_index
 	**/
-	if(token_type)
+	if(token_type>0)
 	{
 		(*subtree).token_type=token_type;
+		MAKE_STD_ZVAL((*subtree).token_index);
+		array_init((*subtree).token_index);
+		add_assoc_long((*subtree).token_index, "type", token_type );
+		//add_next_index_long((*subtree).token_index, token_type );
+		
+
+		MAKE_STD_ZVAL(child_nodes);
+		array_init(child_nodes);
+		add_assoc_zval((*subtree).token_index, "child_nodes", child_nodes );
 	}
 
 	if(!num_args)
 	{
-		(*subtree).token_index=NULL;
+		/*(*subtree).token_index=NULL;*/
 		return 0;
 	}
 	
-	MAKE_STD_ZVAL((*subtree).token_index);
-	array_init((*subtree).token_index);
-
+	
 	
 	j=0;
 	/*
@@ -118,8 +126,10 @@ int eval_rule(YYSTYPE*subtree, int options, int token_type, int num_args, ...)
 			sprintf(key, "%u", j);
 		}
 		
-
-		add_assoc_zval((*subtree).token_index, key, (*node).token_index );
+		//add_next_index_zval((*subtree).token_index, (*node).token_index);
+		add_next_index_zval(child_nodes, (*node).token_index);
+		 
+		//add_assoc_zval((*subtree).token_index, key, (*node).token_index );
 		j++;
     }
     va_end(va);
