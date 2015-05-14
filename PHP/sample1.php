@@ -2,7 +2,7 @@
 	/*
 	 * This sample shows how to modify a SELECT query by adding a WHERE clause
 	 */
-	 echo '<pre>';
+	
 	 include_once(__DIR__.'/lib/SqlParser.class.php');
 	 
 	 $query='SELECT customers.*, users.email
@@ -19,9 +19,9 @@
 	 $newQuery=$parser->rebuildSource();
 	 
 	 
-	 
-	 echo 'Query: '.$query;
-	 echo '<hr>';
-	 echo 'Modified query: '.$newQuery;
+	echo '<pre>';
+	echo 'Query: '.$query;
+	echo '<hr>';
+	echo 'Modified query: '.$newQuery;
 	 
 	 
