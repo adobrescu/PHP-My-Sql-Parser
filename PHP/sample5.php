@@ -15,6 +15,7 @@
 	$parser->addSelectOptions('SQL_CALC_FOUND_ROWS');
 	
 	$subqueries=$parser->getNodesByType(\alib\utils\Sqlparser::PHP_SQL_SUBSELECT);
+	
 	$parser->addSelectOptions('DISTINCTROW', $subqueries[0]);
 	
 	$newQuery=$parser->rebuildSource();
