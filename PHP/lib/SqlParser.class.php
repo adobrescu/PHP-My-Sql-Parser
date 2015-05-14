@@ -344,36 +344,6 @@ class SqlParser
 	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_LIST=10073;
 	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_OPTION=10074;
 	
-	public function &getTokenParseTreeNode($findTokenType, &$startNode=null)
-	{
-		if(is_null($startNode))
-		{
-			$startNode=&$this->parseTree;
-		}
-		
-		foreach($startNode as $tokenType=>&$tokenNode)
-		{
-			if(substr($tokenType,0,5)==$findTokenType)
-			{
-				return $tokenNode;
-			}
-		}
-		
-		foreach($startNode as $tokenType=>&$tokenNode)
-		{
-			if(!is_array($tokenNode))
-			{
-				continue;
-			}
-			if(!is_null($childTokenNode=&$this->getTokenParseTreeNode($findTokenType, $tokenNode)))
-			{
-				return $childTokenNode;
-			}
-			
-		}
-		
-		return $null;
-	}
 	/**
 	 * getNodesByType
 	 * 
@@ -410,7 +380,6 @@ class SqlParser
 					break;
 				}
 			}
-			$this->getNodesByType($findTokenType, $childNode, $nodes);
 		}
 		
 		if(!$nodes || !$stopOnFirstMatch)
@@ -435,8 +404,7 @@ class SqlParser
 	{
 		$numTokens=count($this->tokens);
 		$numTokens=max(array_keys($this->tokens))+1;
-		$tokenNode=&$this->getTokenParseTreeNode($toTokenType, $startNode);
-		
+		$tokenNode=&$this->getNodesByType($toTokenType, $startNode)[0];
 	
 		if($tokenNode && !$replace)
 		{
@@ -473,9 +441,9 @@ class SqlParser
 	{
 		$this->insertSource(static::PHP_SQL_SELECT_OPTIONS, '', $selectOptions, '', $replace=false, $encloseWithParanthesis=false, $startNode);
 	}
-	public function setLimit($limit, $offset=null, &$startNode=null)
+	public function setLimit($limit, $offset=null, &$startNode=null, $offsetKeyword='OFFSET')
 	{
-		$limit='LIMIT '.$limit.($offset?' OFFSET '.$offset:'');
+		$limit='LIMIT '.$limit.($offset?' '.$offsetKeyword.' '.$offset:'');
 		
 		$this->insertSource(static::PHP_SQL_LIMIT, '',	$limit, '', $replace=true, $encloseWithParanthesis=false, $startNode);
 	}
@@ -518,9 +486,13 @@ class SqlParser
 			return $nodes;
 		}
 	}
-	public function getFieldNames($startNode=null)
+	public function getFieldNames($skipSubqueries=true, $startNode=null, $onlyInSelectExprList=true)
 	{
-		if($tokens=$this->getTokenTreeNodes(static::PHP_SQL_COLUMN_NAME, $startNode))
+		if($onlyInSelectExprList)
+		{
+			$startNode=$this->getNodesByType(static::PHP_SQL_SELECT_EXPR_LIST, $startNode)[0];
+		}
+		if($tokens=$this->getNodesByType(static::PHP_SQL_COLUMN_NAME, $startNode, $skipSubqueries=true, false))
 		{
 			foreach($tokens as $token)
 			{
@@ -536,9 +508,9 @@ class SqlParser
 		
 		return $fieldNames;
 	}
-	public function getTableNames($startNode=null)
+	public function getTableNames($skipSubqueries=true, $startNode=null)
 	{
-		if($tokens=$this->getTokenTreeNodes(static::PHP_SQL_TABLE_NAME, $startNode))
+		if($tokens=$this->getNodesByType(static::PHP_SQL_TABLE_NAME, $startNode, $skipSubqueries, false))
 		{
 			foreach($tokens as $token)
 			{
