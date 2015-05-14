@@ -20,19 +20,25 @@ $wheres=array();
 $wheres[]=' a>b AND (tbl.fld<=100)';
 
 $limits=array();
-$limits[]=' LIMIT 50, 101';
-$limits[]=' LIMIT 50 OFFSET 101';
-$limits[]=' LIMIT 50';
+$limits[]=' 50';
+$limits[]=' 50';
+$limits[]=' 50';
 
+$offsets[]=101;
+$offsets[]=101;
+
+$offsetKeyword[]='OFFSET';
+$offsetKeyword[]=',';
+$nullNode=null;
 foreach($queries as $query)
-{
+{ 
 	foreach($orderBys as $orderBy)
 	{
 		$parser->parse($query);
-		$oldOrderBy=$parser->rebuildSourceWithRecursiveCalls($parser->getTokenParseTreeNode(\alib\utils\SqlParser::PHP_SQL_ORDER_BY));
+		$oldOrderBy=$parser->rebuildSourceWithRecursiveCalls($parser->getNodesByType(\alib\utils\SqlParser::PHP_SQL_ORDER_BY, $nullNode, false)[0]);
 		
 		$parser->appendOrderBy($orderBy);
-		$newOrderBy=$parser->rebuildSourceWithRecursiveCalls($parser->getTokenParseTreeNode(\alib\utils\SqlParser::PHP_SQL_ORDER_BY));
+		$newOrderBy=$parser->rebuildSourceWithRecursiveCalls($parser->getNodesByType(\alib\utils\SqlParser::PHP_SQL_ORDER_BY)[0]);
 		
 		ASSERT_EQUALS(trimAll(($oldOrderBy?'':'ORDER BY').$oldOrderBy.($oldOrderBy?',':'').$orderBy), trimAll($newOrderBy));
 	}
@@ -40,10 +46,10 @@ foreach($queries as $query)
 	foreach($wheres as $where)
 	{
 		$parser->parse($query);
-		$oldWhere=$parser->rebuildSourceWithRecursiveCalls($parser->getTokenParseTreeNode(\alib\utils\SqlParser::PHP_SQL_WHERE));
+		$oldWhere=$parser->rebuildSourceWithRecursiveCalls($parser->getNodesByType(\alib\utils\SqlParser::PHP_SQL_WHERE)[0]);
 		
 		$parser->appendWhere($where, 'AND');
-		$newWhere=$parser->rebuildSourceWithRecursiveCalls($parser->getTokenParseTreeNode(\alib\utils\SqlParser::PHP_SQL_WHERE));
+		$newWhere=$parser->rebuildSourceWithRecursiveCalls($parser->getNodesByType(\alib\utils\SqlParser::PHP_SQL_WHERE)[0]);
 		
 		if($oldWhere)
 		{
@@ -58,13 +64,29 @@ foreach($queries as $query)
 			ASSERT_EQUALS( trimAll('WHERE  ( '.$where.' )', true), trimAll($newWhere, true));
 		}
 	}
-	foreach($limits as $limit)
+	foreach($limits as $i=>$limit)
 	{
-		$parser->parse($query);		
-		$parser->setLimit($limit);
-		$newLimit=$parser->rebuildSourceWithRecursiveCalls($parser->getTokenParseTreeNode(\alib\utils\SqlParser::PHP_SQL_LIMIT));
+		$parser->parse($query);
+		if(isset($offsets[$i]))
+		{
+			if(isset($offsetKeyword[$i]))
+			{
+				$parser->setLimit($limit, $offsets[$i], $null, $offsetKeyword[$i]);
+			}
+			else
+			{
+				$parser->setLimit($limit, $offsets[$i]);
+			}
+		}
+		else
+		{
+			$parser->setLimit($limit);
+		}
+		$newLimit=$parser->rebuildSourceWithRecursiveCalls($parser->getNodesByType(\alib\utils\SqlParser::PHP_SQL_LIMIT)[0]);
 		
-		ASSERT_EQUALS( trimAll($limit, true), trimAll($newLimit, true));
+		$sqlLimit='LIMIT '.$limit.(isset($offsets[$i])?(isset($offsetKeyword[$i])?$offsetKeyword[$i]:' OFFSET ').$offsets[$i]:'');
+		
+		ASSERT_EQUALS( trimAll($sqlLimit, true), trimAll($newLimit, true));
 		
 	}
 }
