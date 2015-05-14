@@ -24,7 +24,7 @@ class SqlParser
 	public static $___useCached=false;
 	protected $tokens, $parseTree;
 	
-	public static $___keywords=array('ACCESSIBLE', 'ADD', 'ALL', 'ALTER', 'ANALYZE', 'AND', 'AS', 'ASC', 'ASENSITIVE', 'BEFORE', 'BETWEEN', 'BIGINT', 'BINARY', 'BLOB', 'BOTH', 'BY', 'CALL', 'CASCADE', 'CASE', 'CHANGE', 'CHAR', 'CHARACTER', 'CHECK', 'COLLATE', 'COLUMN', 'CONDITION', 'CONSTRAINT', 'CONTINUE', 'CONVERT', 'CREATE', 'CROSS', 'CURRENT_DATE', 'CURRENT_TIME', 'CURRENT_TIMESTAMP', 'CURRENT_USER', 'CURSOR', 'DATABASE', 'DATABASES', 'DAY_HOUR', 'DAY_MICROSECOND', 'DAY_MINUTE', 'DAY_SECOND', 'DEC', 'DECIMAL', 'DECLARE', 'DEFAULT', 'DELAYED', 'DELETE', 'DESC', 'DESCRIBE', 'DETERMINISTIC', 'DISTINCT', 'DISTINCTROW', 'DIV', 'DOUBLE', 'DROP', 'DUAL', 'EACH', 'ELSE', 'ELSEIF', 'ENCLOSED', 'ESCAPED', 'EXISTS', 'EXIT', 'EXPLAIN', 'FALSE', 'FETCH', 'FLOAT', 'FLOAT4', 'FLOAT8', 'FOR', 'FORCE', 'FOREIGN', 'FROM', 'FULLTEXT', 'GET', 'GRANT', 'GROUP', 'HAVING', 'HIGH_PRIORITY', 'HOUR_MICROSECOND', 'HOUR_MINUTE', 'HOUR_SECOND', 'IF', 'IGNORE', 'IN', 'INDEX', 'INFILE', 'INNER', 'INOUT', 'INSENSITIVE', 'INSERT', 'INT', 'INT1', 'INT2', 'INT3', 'INT4', 'INT8', 'INTEGER', 'INTERVAL', 'INTO', 'IO_AFTER_GTIDS', 'IO_BEFORE_GTIDS', 'IS', 'ITERATE', 'JOIN', 'KEY', 'KEYS', 'KILL', 'LEADING', 'LEAVE', 'LEFT', 'LIKE', 'LIMIT', 'LINEAR', 'LINES', 'LOAD', 'LOCALTIME', 'LOCALTIMESTAMP', 'LOCK', 'LONG', 'LONGBLOB', 'LONGTEXT', 'LOOP', 'LOW_PRIORITY', 'MASTER_BIND', 'MASTER_SSL_VERIFY_SERVER_CERT', 'MATCH', 'MAXVALUE', 'MEDIUMBLOB', 'MEDIUMINT', 'MEDIUMTEXT', 'MIDDLEINT	MINUTE_MICROSECOND', 'MINUTE_SECOND', 'MOD', 'MODIFIES', 'NATURAL', 'NOT', 'NO_WRITE_TO_BINLOG', 'NULL', 'NUMERIC', 'ON', 'OPTIMIZE', 'OPTION', 'OPTIONALLY', 'OR', 'ORDER', 'OUT', 'OUTER', 'OUTFILE', 'PARTITION', 'PRECISION', 'PRIMARY', 'PROCEDURE', 'PURGE', 'RANGE', 'READ', 'READS', 'READ_WRITE', 'REAL', 'REFERENCES', 'REGEXP', 'RELEASE', 'RENAME', 'REPEAT', 'REPLACE', 'REQUIRE', 'RESIGNAL', 'RESTRICT', 'RETURN', 'REVOKE', 'RIGHT', 'RLIKE', 'SCHEMA', 'SCHEMAS', 'SECOND_MICROSECOND', 'SELECT', 'SENSITIVE', 'SEPARATOR', 'SET', 'SHOW', 'SIGNAL', 'SMALLINT', 'SPATIAL', 'SPECIFIC', 'SQL', 'SQLEXCEPTION', 'SQLSTATE', 'SQLWARNING', 'SQL_BIG_RESULT', 'SQL_CALC_FOUND_ROWS', 'SQL_SMALL_RESULT', 'SSL', 'STARTING', 'STRAIGHT_JOIN', 'TABLE', 'TERMINATED', 'THEN', 'TINYBLOB', 'TINYINT', 'TINYTEXT', 'TO', 'TRAILING', 'TRIGGER', 'TRUE', 'UNDO', 'UNION', 'UNIQUE', 'UNLOCK', 'UNSIGNED', 'UPDATE', 'USAGE', 'USE', 'USING', 'UTC_DATE', 'UTC_TIME', 'UTC_TIMESTAMP', 'VALUES', 'VARBINARY', 'VARCHAR', 'VARCHARACTER', 'VARYING', 'WHEN', 'WHERE', 'WHILE', 'WITH', 'WRITE', 'XOR', 'YEAR_MONTH', 'ZEROFILL'		);
+	protected static $___keywords=array('ACCESSIBLE', 'ADD', 'ALL', 'ALTER', 'ANALYZE', 'AND', 'AS', 'ASC', 'ASENSITIVE', 'BEFORE', 'BETWEEN', 'BIGINT', 'BINARY', 'BLOB', 'BOTH', 'BY', 'CALL', 'CASCADE', 'CASE', 'CHANGE', 'CHAR', 'CHARACTER', 'CHECK', 'COLLATE', 'COLUMN', 'CONDITION', 'CONSTRAINT', 'CONTINUE', 'CONVERT', 'CREATE', 'CROSS', 'CURRENT_DATE', 'CURRENT_TIME', 'CURRENT_TIMESTAMP', 'CURRENT_USER', 'CURSOR', 'DATABASE', 'DATABASES', 'DAY_HOUR', 'DAY_MICROSECOND', 'DAY_MINUTE', 'DAY_SECOND', 'DEC', 'DECIMAL', 'DECLARE', 'DEFAULT', 'DELAYED', 'DELETE', 'DESC', 'DESCRIBE', 'DETERMINISTIC', 'DISTINCT', 'DISTINCTROW', 'DIV', 'DOUBLE', 'DROP', 'DUAL', 'EACH', 'ELSE', 'ELSEIF', 'ENCLOSED', 'ESCAPED', 'EXISTS', 'EXIT', 'EXPLAIN', 'FALSE', 'FETCH', 'FLOAT', 'FLOAT4', 'FLOAT8', 'FOR', 'FORCE', 'FOREIGN', 'FROM', 'FULLTEXT', 'GET', 'GRANT', 'GROUP', 'HAVING', 'HIGH_PRIORITY', 'HOUR_MICROSECOND', 'HOUR_MINUTE', 'HOUR_SECOND', 'IF', 'IGNORE', 'IN', 'INDEX', 'INFILE', 'INNER', 'INOUT', 'INSENSITIVE', 'INSERT', 'INT', 'INT1', 'INT2', 'INT3', 'INT4', 'INT8', 'INTEGER', 'INTERVAL', 'INTO', 'IO_AFTER_GTIDS', 'IO_BEFORE_GTIDS', 'IS', 'ITERATE', 'JOIN', 'KEY', 'KEYS', 'KILL', 'LEADING', 'LEAVE', 'LEFT', 'LIKE', 'LIMIT', 'LINEAR', 'LINES', 'LOAD', 'LOCALTIME', 'LOCALTIMESTAMP', 'LOCK', 'LONG', 'LONGBLOB', 'LONGTEXT', 'LOOP', 'LOW_PRIORITY', 'MASTER_BIND', 'MASTER_SSL_VERIFY_SERVER_CERT', 'MATCH', 'MAXVALUE', 'MEDIUMBLOB', 'MEDIUMINT', 'MEDIUMTEXT', 'MIDDLEINT	MINUTE_MICROSECOND', 'MINUTE_SECOND', 'MOD', 'MODIFIES', 'NATURAL', 'NOT', 'NO_WRITE_TO_BINLOG', 'NULL', 'NUMERIC', 'ON', 'OPTIMIZE', 'OPTION', 'OPTIONALLY', 'OR', 'ORDER', 'OUT', 'OUTER', 'OUTFILE', 'PARTITION', 'PRECISION', 'PRIMARY', 'PROCEDURE', 'PURGE', 'RANGE', 'READ', 'READS', 'READ_WRITE', 'REAL', 'REFERENCES', 'REGEXP', 'RELEASE', 'RENAME', 'REPEAT', 'REPLACE', 'REQUIRE', 'RESIGNAL', 'RESTRICT', 'RETURN', 'REVOKE', 'RIGHT', 'RLIKE', 'SCHEMA', 'SCHEMAS', 'SECOND_MICROSECOND', 'SELECT', 'SENSITIVE', 'SEPARATOR', 'SET', 'SHOW', 'SIGNAL', 'SMALLINT', 'SPATIAL', 'SPECIFIC', 'SQL', 'SQLEXCEPTION', 'SQLSTATE', 'SQLWARNING', 'SQL_BIG_RESULT', 'SQL_CALC_FOUND_ROWS', 'SQL_SMALL_RESULT', 'SSL', 'STARTING', 'STRAIGHT_JOIN', 'TABLE', 'TERMINATED', 'THEN', 'TINYBLOB', 'TINYINT', 'TINYTEXT', 'TO', 'TRAILING', 'TRIGGER', 'TRUE', 'UNDO', 'UNION', 'UNIQUE', 'UNLOCK', 'UNSIGNED', 'UPDATE', 'USAGE', 'USE', 'USING', 'UTC_DATE', 'UTC_TIME', 'UTC_TIMESTAMP', 'VALUES', 'VARBINARY', 'VARCHAR', 'VARCHARACTER', 'VARYING', 'WHEN', 'WHERE', 'WHILE', 'WITH', 'WRITE', 'XOR', 'YEAR_MONTH', 'ZEROFILL'		);
 	 
 	protected static $___tokenCodes=array
 							(
@@ -35,7 +35,110 @@ class SqlParser
 								/*operators*/
 								':=' => 'a', '||' => 'b', '&&' => 'c', '!=' => 'd', '/' => 'e', '%' => 'f', '=' => 'g', '<=>' => 'h', '>=' => 'i', '<<' => 'j', '>>' => 'k', '<>' => 'l', '<=' => 'm', '<' => 'n', '>' => 'o', '|' => 'p', '&' => 'q', '^' => 'r', '+' => 's', '-' => 't', '~' => 'u', '*' => 'v', '(' => 'x', ')' => 'z', ',' => 'A', '.' => 'B',
 							);
+	/*sql expression/(part of) statements codes as they are set by the parser (see sql.y and php_alsqlp.h; their values MUST match defines from php_alsqlp.h)*/
+	const PHP_SQL_STATEMENT_SELECT=10002;
+	const PHP_SQL_STATEMENT_INSERT=10003;
+	const PHP_SQL_STATEMENT_UPDATE=10004;
+	const PHP_SQL_STATEMENT_DELETE=10005;
+	const PHP_SQL_STATEMENT_REPLACE=10006;
+	const PHP_SQL_STATEMENT_UNION_SELECT=10007;
+	const PHP_SQL_STATEMENT_UNION=10008;
+
+	const PHP_SQL_WHERE=10020;
+	const PHP_SQL_ORDER_BY=10021;
+	const PHP_SQL_LIMIT=10022;
+	const PHP_SQL_COLUMN_NAME=10023;
+	const PHP_SQL_TABLE_NAME=10024;
+	const PHP_SQL_SELECT_OPTIONS=10025;
+	const PHP_SQL_GROUP_BY=10026;
+	const PHP_SQL_EXPR=10027;
 	
+	
+	const PHP_SQL_FROM=10028;
+	const PHP_SQL_HAVING=10029;
+	const PHP_SQL_SELECT_EXPR=10030;
+	const PHP_SQL_SELECT_EXPR_LIST=10031;
+	const PHP_SQL_EXPR_LIST=10032;
+	const PHP_SQL_TABLE_REFERENCES=10033;
+	const PHP_SQL_TABLE_FACTOR=10034;
+	const PHP_SQL_INDEX_HINT=10035;
+	const PHP_SQL_SELECT_TYPE=10036;
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS=10037;
+	const PHP_SQL_PROCEDURE=10038;
+	const PHP_SQL_SELECT_OPTION=10039;
+	const PHP_SQL_JOIN_TYPE=10040;
+	const PHP_SQL_JOIN_CONDITION=10041;
+	const PHP_SQL_FUNCTION3=10042;
+	const PHP_SQL_SEPARATOR=10043;
+	const PHP_SQL_SUBSELECT=10044;
+	const PHP_SQL_UPDATE_OPTIONS_LIST=10045;
+	const PHP_SQL_UPDATE_OPTION=10046;
+	const PHP_SQL_INSERT_OPTIONS_LIST=10047;
+	const PHP_SQL_INSERT_OPTION=10048;
+	const PHP_SQL_INTO=10049;
+	const PHP_SQL_PARTITION=10050;
+	const PHP_SQL_COLUMN_NAMES_LIST=10051;
+	const PHP_SQL_VALUES=10052;
+	const PHP_SQL_SELECT_EXPR_LIST2=10053; /*with paranthesis eg: (a, 1+100, 1+select '1')*/
+	const PHP_SQL_ON_DUPLICATE_KEY_UPDATE=10054;
+	const PHP_SQL_REPLACE_OPTIONS_LIST=10055;
+	const PHP_SQL_REPLACE_OPTION=10056;
+	const PHP_SQL_DELETE_OPTIONS_LIST=10057;
+	const PHP_SQL_DELETE_OPTION=10058;
+	const PHP_SQL_DELETE_TABLES_LIST=10059;
+	const PHP_SQL_DELETE_TABLE=10060;
+	const PHP_SQL_SORT_EXPR_LIST=10061;
+	const PHP_SQL_SORT_EXPR=10062;
+	const PHP_SQL_SORT_DIRECTION=10063;
+	const PHP_SQL_WITH_ROLLUP=10064;
+	const PHP_SQL_WHEN_THEN_EXPR_LIST=10065;
+	const PHP_SQL_WHEN_THEN_EXPR=10066;
+	const PHP_SQL_WHEN_THEN_ELSE_EXPR=10067;
+	const PHP_SQL_FUNCTION5=10068;
+	const PHP_SQL_FUNCTION5_SYNTAX=10069;
+
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_OPTIONS=10070;
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_FIELDS=10071;
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_LINES=10072;
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_LIST=10073;
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_OPTION=10074;
+	/*end codes*/
+	/*regexp used to split sql stamenets in tokens when alsqlp extension is not available*/
+	static protected $___regexpTokens='';
+	static protected $___regexpTokenDefs=array(
+		/*string*/			1 =>'(((?<![\\\])[\'"])((?:.(?!(?<![\\\])\2))*.?)(\2))',
+		/*parameter*/		2 => '(\@[a-z\_][a-z\_0-9]*)',
+		/*backquoted_id*/	3 => '(`[a-z\_][a-z\_0-9\\s]*`)',
+		/*join type*/		
+							//50 => '(NATURAL[\\s]+OUTER[\\s]+JOIN|STRAIGHT_JOIN|INNER[\\s]+JOIN|CROSS[\\s]+JOIN|LEFT[\\s]+JOIN|LEFT[\\s]+OUTER[\\s]+JOIN|RIGHT[\\s]+OUTER[\\s]+JOIN|RIGHT[\\s]+JOIN|NATURAL[\\s]+LEFT[\\s]+OUTER[\\s]+JOIN|NATURAL[\\s]+LEFT[\\s]+JOIN|NATURAL[\\s]+JOIN|NATURAL[\\s]+RIGHT[\\s]+OUTER[\\s]+JOIN|NATURAL[\\s]+RIGHT[\\s]+JOIN)',
+							50 => '(STRAIGHT_JOIN|(?:NATURAL[\\s]+|)(?:LEFT[\\s]+|RIGHT[\\s]+|INNER[\\s]+|CROSS[\\s]+|)(?:OUTER[\\s]+|)JOIN)',
+		/*join index hint*/	
+							//70 => '(IGNORE[\\s]+INDEX|IGNORE[\\s]+KEY|IGNORE[\\s]+INDEX[\\s]+FOR[\\s]+JOIN|IGNORE[\\s]+KEY[\\s]+FOR[\\s]+JOIN|FORCE[\\s]+INDEX)',
+							70 => '((?:USE|IGNORE|FORCE)[\\s]+(?:INDEX|KEY)(?:(?:[\\s]+FOR[\\s]+JOIN)|))',
+		/*keyword*/			4 => '(ON[\\s]+DUPLICATE[\\s]+KEY[\\s]+UPDATE|IS[\\s]+NULL|IS[\\s]+NOT[\\s]+NULL|ORDER[\\s]+BY|GROUP[\\s]+BY|WITH[\\s]+ROLLUP|INTO[\\s]+OUTFILE|INTO[\\s]+DUMPFILE)',
+		/*export options*/	110 => '((?:OPTIONALLY[\\s]+|)(?:TERMINATED|ENCLOSED|ESCAPED|STARTING)[\\s]+BY)',
+		/*union*/			100 => '(UNION[\\s]+DISTINCT|UNION[\\s]+ALL|UNION)',
+		/*select type*/		45 => '(LOCK[\\s]+IN[\\s]+SHARE[\\s]+MODE|FOR[\\s]+UPDATE)',
+		/*hex_number*/		5 => '([xb]\'[0-9a-z]+\')',
+		/*id*/				6 => '([a-z][a-z0-9\_]*)',
+		/*number*/			7 => '([0-9]*[\.]{0,1}[0-9]*e[\+\-][0-9]+|[0-9]*[.][0-9]+|0x[0-9a-z]+|[0-9]+)',
+		/*operator*/		8 => '(\:\=|\|\||\&\&|\!\=|\/|\%|\=|\<\=\>|\>\=|\<\<|\>\>|\<\>|\<\=|\<|\>|\||\&|\^|\+|\-|\~|\*|\(|\)|\,|\.)'
+			);
+	static protected $___regexpTokenTypes=array(
+		/*string*/			1=> TOKEN_TYPE_STRING,
+		/*parameter*/		5 => TOKEN_TYPE_PARAMETER, 
+		/*backquoted_id*/	6 => TOKEN_TYPE_BACKQUOTED_ID,
+		/*join type*/		7 => TOKEN_JOIN_TYPE,
+		/*join index hint*/	8 => TOKEN_JOIN_INDEX_HINT,
+		/*keyword*/			9 => TOKEN_TYPE_KEYWORD, 
+		/*export options*/	10 => TOKEN_TYPE_EXPORT_OPTIONS,
+		/*union*/			11 => TOKEN_TYPE_UNION,
+		/*select type*/		12 => TOKEN_TYPE_SELECT_TYPE,
+		/*hex_number*/		13 => TOKEN_TYPE_HEX_NUMBER,
+		/*id*/				14 => TOKEN_TYPE_ID, 
+		/*number*/			15 => TOKEN_TYPE_NUMBER, 
+		/*operator*/		16 => TOKEN_TYPE_OPERATOR
+		);
 	static public function ___getKeywords()
 	{
 		return static::$___keywords;
@@ -71,12 +174,7 @@ class SqlParser
 		
 		$cacheFileName.='/'.$cacheFileNameParts[$numCacheFilenNameParts-1].'.php';
 		return $cacheFileName;
-	}
-	public function parseExpression($sqlExpression)
-	{
-		print_r(parseSqlQuery(')'.$sqlExpression));
-	}
-	
+	}	
 	public function parse($source, $tokensStartIndex=10)
 	{
 		
@@ -189,41 +287,6 @@ class SqlParser
 		return $source;
 	}
 	
-	static protected $___regexpTokens='';
-	static protected $___regexpTokenDefs=array(
-		/*string*/			1 =>'(((?<![\\\])[\'"])((?:.(?!(?<![\\\])\2))*.?)(\2))',
-		/*parameter*/		2 => '(\@[a-z\_][a-z\_0-9]*)',
-		/*backquoted_id*/	3 => '(`[a-z\_][a-z\_0-9\\s]*`)',
-		/*join type*/		
-							//50 => '(NATURAL[\\s]+OUTER[\\s]+JOIN|STRAIGHT_JOIN|INNER[\\s]+JOIN|CROSS[\\s]+JOIN|LEFT[\\s]+JOIN|LEFT[\\s]+OUTER[\\s]+JOIN|RIGHT[\\s]+OUTER[\\s]+JOIN|RIGHT[\\s]+JOIN|NATURAL[\\s]+LEFT[\\s]+OUTER[\\s]+JOIN|NATURAL[\\s]+LEFT[\\s]+JOIN|NATURAL[\\s]+JOIN|NATURAL[\\s]+RIGHT[\\s]+OUTER[\\s]+JOIN|NATURAL[\\s]+RIGHT[\\s]+JOIN)',
-							50 => '(STRAIGHT_JOIN|(?:NATURAL[\\s]+|)(?:LEFT[\\s]+|RIGHT[\\s]+|INNER[\\s]+|CROSS[\\s]+|)(?:OUTER[\\s]+|)JOIN)',
-		/*join index hint*/	
-							//70 => '(IGNORE[\\s]+INDEX|IGNORE[\\s]+KEY|IGNORE[\\s]+INDEX[\\s]+FOR[\\s]+JOIN|IGNORE[\\s]+KEY[\\s]+FOR[\\s]+JOIN|FORCE[\\s]+INDEX)',
-							70 => '((?:USE|IGNORE|FORCE)[\\s]+(?:INDEX|KEY)(?:(?:[\\s]+FOR[\\s]+JOIN)|))',
-		/*keyword*/			4 => '(ON[\\s]+DUPLICATE[\\s]+KEY[\\s]+UPDATE|IS[\\s]+NULL|IS[\\s]+NOT[\\s]+NULL|ORDER[\\s]+BY|GROUP[\\s]+BY|WITH[\\s]+ROLLUP|INTO[\\s]+OUTFILE|INTO[\\s]+DUMPFILE)',
-		/*export options*/	110 => '((?:OPTIONALLY[\\s]+|)(?:TERMINATED|ENCLOSED|ESCAPED|STARTING)[\\s]+BY)',
-		/*union*/			100 => '(UNION[\\s]+DISTINCT|UNION[\\s]+ALL|UNION)',
-		/*select type*/		45 => '(LOCK[\\s]+IN[\\s]+SHARE[\\s]+MODE|FOR[\\s]+UPDATE)',
-		/*hex_number*/		5 => '([xb]\'[0-9a-z]+\')',
-		/*id*/				6 => '([a-z][a-z0-9\_]*)',
-		/*number*/			7 => '([0-9]*[\.]{0,1}[0-9]*e[\+\-][0-9]+|[0-9]*[.][0-9]+|0x[0-9a-z]+|[0-9]+)',
-		/*operator*/		8 => '(\:\=|\|\||\&\&|\!\=|\/|\%|\=|\<\=\>|\>\=|\<\<|\>\>|\<\>|\<\=|\<|\>|\||\&|\^|\+|\-|\~|\*|\(|\)|\,|\.)'
-			);
-	static protected $___regexpTokenTypes=array(
-		/*string*/			1=> TOKEN_TYPE_STRING,
-		/*parameter*/		5 => TOKEN_TYPE_PARAMETER, 
-		/*backquoted_id*/	6 => TOKEN_TYPE_BACKQUOTED_ID,
-		/*join type*/		7 => TOKEN_JOIN_TYPE,
-		/*join index hint*/	8 => TOKEN_JOIN_INDEX_HINT,
-		/*keyword*/			9 => TOKEN_TYPE_KEYWORD, 
-		/*export options*/	10 => TOKEN_TYPE_EXPORT_OPTIONS,
-		/*union*/			11 => TOKEN_TYPE_UNION,
-		/*select type*/		12 => TOKEN_TYPE_SELECT_TYPE,
-		/*hex_number*/		13 => TOKEN_TYPE_HEX_NUMBER,
-		/*id*/				14 => TOKEN_TYPE_ID, 
-		/*number*/			15 => TOKEN_TYPE_NUMBER, 
-		/*operator*/		16 => TOKEN_TYPE_OPERATOR
-		);
 	protected static function ___buildRegexpTokens()
 	{
 		foreach(static::$___regexpTokenDefs as $r)
@@ -272,87 +335,18 @@ class SqlParser
 		
 		return $this->tokens;
 	}
-	
-	
-	
-	
-	
-	const PHP_SQL_STATEMENT_SELECT=10002;
-	const PHP_SQL_STATEMENT_INSERT=10003;
-	const PHP_SQL_STATEMENT_UPDATE=10004;
-	const PHP_SQL_STATEMENT_DELETE=10005;
-	const PHP_SQL_STATEMENT_REPLACE=10006;
-	const PHP_SQL_STATEMENT_UNION_SELECT=10007;
-	const PHP_SQL_STATEMENT_UNION=10008;
 
-	const PHP_SQL_WHERE=10020;
-	const PHP_SQL_ORDER_BY=10021;
-	const PHP_SQL_LIMIT=10022;
-	const PHP_SQL_COLUMN_NAME=10023;
-	const PHP_SQL_TABLE_NAME=10024;
-	const PHP_SQL_SELECT_OPTIONS=10025;
-	const PHP_SQL_GROUP_BY=10026;
-	const PHP_SQL_EXPR=10027;
-	
-	
-	const PHP_SQL_FROM=10028;
-	const PHP_SQL_HAVING=10029;
-	const PHP_SQL_SELECT_EXPR=10030;
-	const PHP_SQL_SELECT_EXPR_LIST=10031;
-	const PHP_SQL_EXPR_LIST=10032;
-	const PHP_SQL_TABLE_REFERENCES=10033;
-	const PHP_SQL_TABLE_FACTOR=10034;
-	const PHP_SQL_INDEX_HINT=10035;
-	const PHP_SQL_SELECT_TYPE=10036;
-	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS=10037;
-	const PHP_SQL_PROCEDURE=10038;
-	const PHP_SQL_SELECT_OPTION=10039;
-	const PHP_SQL_JOIN_TYPE=10040;
-	const PHP_SQL_JOIN_CONDITION=10041;
-	const PHP_SQL_FUNCTION3=10042;
-	const PHP_SQL_SEPARATOR=10043;
-	const PHP_SQL_SUBSELECT=10044;
-	const PHP_SQL_UPDATE_OPTIONS_LIST=10045;
-	const PHP_SQL_UPDATE_OPTION=10046;
-	const PHP_SQL_INSERT_OPTIONS_LIST=10047;
-	const PHP_SQL_INSERT_OPTION=10048;
-	const PHP_SQL_INTO=10049;
-	const PHP_SQL_PARTITION=10050;
-	const PHP_SQL_COLUMN_NAMES_LIST=10051;
-	const PHP_SQL_VALUES=10052;
-	const PHP_SQL_SELECT_EXPR_LIST2=10053; /*with paranthesis eg: (a, 1+100, 1+select '1')*/
-	const PHP_SQL_ON_DUPLICATE_KEY_UPDATE=10054;
-	const PHP_SQL_REPLACE_OPTIONS_LIST=10055;
-	const PHP_SQL_REPLACE_OPTION=10056;
-	const PHP_SQL_DELETE_OPTIONS_LIST=10057;
-	const PHP_SQL_DELETE_OPTION=10058;
-	const PHP_SQL_DELETE_TABLES_LIST=10059;
-	const PHP_SQL_DELETE_TABLE=10060;
-	const PHP_SQL_SORT_EXPR_LIST=10061;
-	const PHP_SQL_SORT_EXPR=10062;
-	const PHP_SQL_SORT_DIRECTION=10063;
-	const PHP_SQL_WITH_ROLLUP=10064;
-	const PHP_SQL_WHEN_THEN_EXPR_LIST=10065;
-	const PHP_SQL_WHEN_THEN_EXPR=10066;
-	const PHP_SQL_WHEN_THEN_ELSE_EXPR=10067;
-	const PHP_SQL_FUNCTION5=10068;
-	const PHP_SQL_FUNCTION5_SYNTAX=10069;
-
-	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_OPTIONS=10070;
-	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_FIELDS=10071;
-	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_LINES=10072;
-	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_LIST=10073;
-	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_OPTION=10074;
-	
 	/**
 	 * getNodesByType
 	 * 
 	 * Returns an array containing references to nodes of type $findTokenType
 	 * 
-	 * @param type $findTokenType
-	 * @param type $startNode
+	 * @param string	$findTokenType		- type of nodes to find
+	 * @param array		$startNode			- to what node to start searching
+	 * @param boolean	$skipSubqueries		- search through sub-selects or not
+	 * @param boolean	$stopOnFirstMatch	- stop on first node found or not
+	 * @param array		$nodes				- found nodes are added to $nodes
 	 */
-	public function getNodesByType($findTokenType, &$startNode=null, &$nodes=null)
 	public function getNodesByType($findTokenType, &$startNode=null, $skipSubqueries=true, $stopOnFirstMatch=true, &$nodes=null)
 	{
 		if($returnValue=is_null($nodes))
