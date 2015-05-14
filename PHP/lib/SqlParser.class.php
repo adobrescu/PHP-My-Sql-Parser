@@ -455,9 +455,11 @@ class SqlParser
 	{
 		$this->insertSource(static::PHP_SQL_SELECT_OPTIONS, '', $selectOptions, '', $replace=false, $encloseWithParanthesis=false);
 	}
-	public function setLimit($limit)
+	public function setLimit($limit, $offset=null, &$startNode=null)
 	{
-		$this->insertSource(static::PHP_SQL_LIMIT, '', $limit, '', $replace=true, $encloseWithParanthesis=false);
+		$limit='LIMIT '.$limit.($offset?' OFFSET '.$offset:'');
+		
+		$this->insertSource(static::PHP_SQL_LIMIT, '',	$limit, '', $replace=true, $encloseWithParanthesis=false, $startNode);
 	}
 	
 	public function getTokenTreeNodes($tokenType, &$node=null, $depth=0)
