@@ -103,7 +103,7 @@ int eval_rule(YYSTYPE*subtree, int options, int token_type, int num_args, ...)
 			The key has the form "node type-node index" for nodes with a code (eg SELECT)
 			or just "node index" for nodes without a code (eg +, - , paranthesis etc)
 		*/
-		if((*node).token_type!=IS_TOKEN)
+		//if((*node).token_type!=IS_TOKEN)
 		{
 			key_num=0;
 			do
@@ -113,10 +113,11 @@ int eval_rule(YYSTYPE*subtree, int options, int token_type, int num_args, ...)
 			}
 			while(zend_symtable_exists(((*subtree).token_index->value).ht, key, strlen(key)+1));
 		}
-		else
+		/*else
 		{
 			sprintf(key, "%u", j);
 		}
+		*/
 		
 
 		add_assoc_zval((*subtree).token_index, key, (*node).token_index );
