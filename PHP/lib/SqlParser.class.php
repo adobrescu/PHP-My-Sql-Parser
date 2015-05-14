@@ -130,9 +130,9 @@ class SqlParser
 		return $this->parseTree;
 	}
 	
-	public function rebuildSource($inserts=null)
+	public function rebuildSource($inserts=null, $startNode=null)
 	{
-		return $this->rebuildSourceWithRecursiveCalls($null, $inserts);
+		return $this->rebuildSourceWithRecursiveCalls($startNode, $inserts);
 		
 	}
 	public function rebuildSourceWithRecursiveCalls(&$node=null, $inserts=null)
