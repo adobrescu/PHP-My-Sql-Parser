@@ -383,6 +383,7 @@ class SqlParser
 	 * @param type $startNode
 	 */
 	public function getNodesByType($findTokenType, &$startNode=null, &$nodes=null)
+	public function getNodesByType($findTokenType, &$startNode=null, $skipSubqueries=true, $stopOnFirstMatch=true, &$nodes=null)
 	{
 		if($returnValue=is_null($nodes))
 		{
@@ -404,10 +405,27 @@ class SqlParser
 			if(substr($childNodeType,0,5)==$findTokenType)
 			{
 				$nodes[]=&$childNode;
+				if($stopOnFirstMatch)
+				{
+					break;
+				}
 			}
 			$this->getNodesByType($findTokenType, $childNode, $nodes);
 		}
 		
+		if(!$nodes || !$stopOnFirstMatch)
+		{
+			foreach($startNode as $childNodeType=>&$childNode)
+			{
+				$childNodeType=substr($childNodeType,0,5);
+
+				if($skipSubqueries && $childNodeType==static::PHP_SQL_SUBSELECT && $findTokenType!=static::PHP_SQL_SUBSELECT)
+				{
+					continue;
+				}
+				$this->getNodesByType($findTokenType, $childNode, $skipSubqueries, $stopOnFirstMatch, $nodes);
+			}
+		}
 		if($returnValue)
 		{
 			return $nodes;
