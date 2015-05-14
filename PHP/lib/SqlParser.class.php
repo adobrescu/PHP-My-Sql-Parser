@@ -447,13 +447,13 @@ class SqlParser
 	{
 		$this->insertSource(static::PHP_SQL_WHERE, 'WHERE', $cond, $operator, $replace=false, $encloseWithParanthesis=true, $startNode);
 	}
-	public function appendOrderBy($orderBy)
+	public function appendOrderBy($orderBy, &$startNode=null)
 	{
-		$this->insertSource(static::PHP_SQL_ORDER_BY, 'ORDER BY', $orderBy, ',', $replace=false, $encloseWithParanthesis=false);
+		$this->insertSource(static::PHP_SQL_ORDER_BY, 'ORDER BY', $orderBy, ',', $replace=false, $encloseWithParanthesis=false, $startNode);
 	}
-	public function addSelectOptions($selectOptions)
+	public function addSelectOptions($selectOptions, &$startNode=null)
 	{
-		$this->insertSource(static::PHP_SQL_SELECT_OPTIONS, '', $selectOptions, '', $replace=false, $encloseWithParanthesis=false);
+		$this->insertSource(static::PHP_SQL_SELECT_OPTIONS, '', $selectOptions, '', $replace=false, $encloseWithParanthesis=false, $startNode);
 	}
 	public function setLimit($limit, $offset=null, &$startNode=null)
 	{
