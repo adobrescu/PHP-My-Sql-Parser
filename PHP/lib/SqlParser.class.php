@@ -160,7 +160,7 @@ class SqlParser
 					}
 				}
 			}
-			return ($this->tokens[$node][1]!=TOKEN_TYPE_OPERATOR?' ':' ').$this->tokens[$node][0].$source;
+			return ($this->tokens[$node][0]=='('?'':' ').$this->tokens[$node][0].$source;
 		}
 		
 		
@@ -294,12 +294,63 @@ class SqlParser
 	const PHP_SQL_GROUP_BY=10026;
 	const PHP_SQL_EXPR=10027;
 	
+	
+	const PHP_SQL_FROM=10028;
+	const PHP_SQL_HAVING=10029;
+	const PHP_SQL_SELECT_EXPR=10030;
+	const PHP_SQL_SELECT_EXPR_LIST=10031;
+	const PHP_SQL_EXPR_LIST=10032;
+	const PHP_SQL_TABLE_REFERENCES=10033;
+	const PHP_SQL_TABLE_FACTOR=10034;
+	const PHP_SQL_INDEX_HINT=10035;
+	const PHP_SQL_SELECT_TYPE=10036;
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS=10037;
+	const PHP_SQL_PROCEDURE=10038;
+	const PHP_SQL_SELECT_OPTION=10039;
+	const PHP_SQL_JOIN_TYPE=10040;
+	const PHP_SQL_JOIN_CONDITION=10041;
+	const PHP_SQL_FUNCTION3=10042;
+	const PHP_SQL_SEPARATOR=10043;
+	const PHP_SQL_SUBSELECT=10044;
+	const PHP_SQL_UPDATE_OPTIONS_LIST=10045;
+	const PHP_SQL_UPDATE_OPTION=10046;
+	const PHP_SQL_INSERT_OPTIONS_LIST=10047;
+	const PHP_SQL_INSERT_OPTION=10048;
+	const PHP_SQL_INTO=10049;
+	const PHP_SQL_PARTITION=10050;
+	const PHP_SQL_COLUMN_NAMES_LIST=10051;
+	const PHP_SQL_VALUES=10052;
+	const PHP_SQL_SELECT_EXPR_LIST2=10053; /*with paranthesis eg: (a, 1+100, 1+select '1')*/
+	const PHP_SQL_ON_DUPLICATE_KEY_UPDATE=10054;
+	const PHP_SQL_REPLACE_OPTIONS_LIST=10055;
+	const PHP_SQL_REPLACE_OPTION=10056;
+	const PHP_SQL_DELETE_OPTIONS_LIST=10057;
+	const PHP_SQL_DELETE_OPTION=10058;
+	const PHP_SQL_DELETE_TABLES_LIST=10059;
+	const PHP_SQL_DELETE_TABLE=10060;
+	const PHP_SQL_SORT_EXPR_LIST=10061;
+	const PHP_SQL_SORT_EXPR=10062;
+	const PHP_SQL_SORT_DIRECTION=10063;
+	const PHP_SQL_WITH_ROLLUP=10064;
+	const PHP_SQL_WHEN_THEN_EXPR_LIST=10065;
+	const PHP_SQL_WHEN_THEN_EXPR=10066;
+	const PHP_SQL_WHEN_THEN_ELSE_EXPR=10067;
+	const PHP_SQL_FUNCTION5=10068;
+	const PHP_SQL_FUNCTION5_SYNTAX=10069;
+
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_OPTIONS=10070;
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_FIELDS=10071;
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_LINES=10072;
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_LIST=10073;
+	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_OPTION=10074;
+	
 	public function &getTokenParseTreeNode($findTokenType, &$startNode=null)
 	{
 		if(is_null($startNode))
 		{
 			$startNode=&$this->parseTree;
 		}
+		
 		foreach($startNode as $tokenType=>&$tokenNode)
 		{
 			if(substr($tokenType,0,5)==$findTokenType)
@@ -307,21 +358,21 @@ class SqlParser
 				return $tokenNode;
 			}
 		}
-		//echo 'bla '.$b;
+		
 		foreach($startNode as $tokenType=>&$tokenNode)
 		{
-			//echo 'axxa'; 
+			if(!is_array($tokenNode))
+			{
+				continue;
+			}
 			if(!is_null($childTokenNode=&$this->getTokenParseTreeNode($findTokenType, $tokenNode)))
 			{
 				return $childTokenNode;
 			}
-			//print_r($childTokenNode);
-			//echo '<br>----<br>';
+			
 		}
-		//echo $b.' '.$tokenType.'<br>';
-		//print_r($this->parseTree);
-		//die('aici: '.$findTokenType);
-		return null;
+		
+		return $null;
 	}
 	/**
 	 * getNodesByType
@@ -368,19 +419,17 @@ class SqlParser
 		$numTokens=max(array_keys($this->tokens))+1;
 		$tokenNode=&$this->getTokenParseTreeNode($toTokenType, $startNode);
 		
-		
+	
 		if($tokenNode && !$replace)
 		{
-			//print_r($tokenNode);
 			if($encloseWithParanthesis)
 			{
 				array_splice($tokenNode, 1, 0, array($numTokens));
 				$this->tokens[$numTokens]=array(0=>'(', 1=>1);
 			}
 			
-			//echo '<hr>';
-			array_splice($tokenNode, count($tokenNode), 0, array($numTokens+1));				
-			//print_r($tokenNode);
+			array_splice($tokenNode, count($tokenNode), 0, array($numTokens+1));
+			
 			$this->tokens[$numTokens+1]=array(0=>($encloseWithParanthesis?') ':'').$operator.($encloseWithParanthesis?' ( ':'').$source.($encloseWithParanthesis?' )':''), 1=>1);
 		}
 		else
@@ -389,11 +438,12 @@ class SqlParser
 			$this->tokens[$numTokens]=array(0=>' '.$toTokenName.' '.($encloseWithParanthesis?'( ':'').$source.($encloseWithParanthesis?' )':''), 1=>1);
 					
 		}
+		
 			
-		//$rebuiltQuery=$this->rebuildSource();
-		//$this->parse($rebuiltQuery);
+		$rebuiltQuery=$this->rebuildSource();
+		$this->parse($rebuiltQuery);
 	}
-	public function appendWhere($cond, $operator=null, $startNode=null)
+	public function appendWhere($cond, $operator=null, &$startNode=null)
 	{
 		$this->insertSource(static::PHP_SQL_WHERE, 'WHERE', $cond, $operator, $replace=false, $encloseWithParanthesis=true, $startNode);
 	}
