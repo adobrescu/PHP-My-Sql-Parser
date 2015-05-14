@@ -592,13 +592,13 @@ expression:
 	| expression OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST '(' expressions_list ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 5, &$1, &$2, &$3, &$4, &$5); }
 	
 	//expression IN (SELECT ...)
-	| expression OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST '(' statement_select ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 5, &$1, &$2, &$3, &$4, &$5); }
+	| expression OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST subquery { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 3, &$1, &$2, &$3); }
 
 	// expression NOT IN ( expression, expression, ...) - expression poate fi un subselect (SELECT ...)
 	| expression OPERATOR_1_OPERANDS OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST '(' expressions_list ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 6, &$1, &$2, &$3, &$4, &$5, &$6); }
 
 	//expression NOT IN (SELECT ...)
-	| expression OPERATOR_1_OPERANDS OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST '(' statement_select ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 6, &$1, &$2, &$3, &$4, &$5, &$6); }
+	| expression OPERATOR_1_OPERANDS OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST subquery { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 4, &$1, &$2, &$3, &$4); }
 
 	| '(' expression ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 3, &$1, &$2, &$3); }
 	| subquery { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 1, &$1); }
