@@ -75,7 +75,7 @@ typedef struct php_sql_token
 #define PHP_SQL_PARTITION			10050
 #define PHP_SQL_COLUMN_NAMES_LIST	10051
 #define PHP_SQL_VALUES				10052
-#define PHP_SQL_SELECT_EXPR_LIST2	10053 /*with paranthesis eg: (a, 1+100, 1+select '1')*/
+#define PHP_SQL_EXPR_LIST2			10053 /*with paranthesis eg: (a, 1+100, 1+select '1')*/
 #define PHP_SQL_ON_DUPLICATE_KEY_UPDATE 10054
 #define PHP_SQL_REPLACE_OPTIONS_LIST 10055
 #define PHP_SQL_REPLACE_OPTION		10056
