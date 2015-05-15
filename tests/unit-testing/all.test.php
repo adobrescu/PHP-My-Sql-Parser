@@ -17,7 +17,7 @@ $testFiles=array(
 	'JOINhints-use-index-for-join(etc).php',
 	'INTO(export).php',
 	
-	'insertSource.php'
+	'insertSource.php' 
 	);
 
 
