@@ -564,4 +564,29 @@ class SqlParser
 		
 		return $tableNames;
 	}
+	public function getTableNameAliases($skipSubqueries=true, $startNode=null)
+	{
+		//, &$startNode=null, $skipSubqueries=true, $stopOnFirstMatch=true, &$nodes=null)
+		if($nodes=$this->getNodesByType(static::PHP_SQL_TABLE_FACTOR, $startNode, $skipSubqueries, $stopOnFirstMatch=false))
+		{
+			//print_r($nodes);
+			foreach($nodes as $node)
+			{
+				$tableFactorAliasNode=isset($node[static::PHP_SQL_TABLE_FACTOR_ALIAS.'-0']) ? $node[static::PHP_SQL_TABLE_FACTOR_ALIAS.'-0']:null;
+				if(!$tableFactorAliasNode)
+				{
+					$alias='';
+				}
+				else
+				{
+					$alias=$this->tokens[count($tableFactorAliasNode)>1?$tableFactorAliasNode[1]:$tableFactorAliasNode[0]][0];
+				}
+				$tblName=isset($node['10024-0'])?$this->tokens[end($node['10024-0'])][0]:'';
+				//echo $tblName."\n";
+				$aliases[]=array($tblName=>$alias);
+			}
+			
+			return $aliases;
+		}
+	}
 }
