@@ -290,9 +290,10 @@ extern char *yytext;
 
 %start statement
 
+/*
 %glr-parser
 %expect-rr 1
-
+*/
 
 %%
 
@@ -365,7 +366,7 @@ from:
 	;
 /* /FROM */
 statement_update:
-	UPDATE statement_update_options_enum table_references SET expressions_list where_optional order_by_optional limit_optional { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_UPDATE, 8, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8); }
+	UPDATE statement_update_options_enum table_references set where_optional order_by_optional limit_optional { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_UPDATE, 7, &$1, &$2, &$3, &$4, &$5, &$6, &$7); }
 	;
 statement_update_options_enum:
 	{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_UPDATE_OPTIONS_LIST,0); }
@@ -388,11 +389,11 @@ statement_delete:
 
 statement_replace:
 	//REPLACE ... VALUES (...)
-	REPLACE statement_replace_options_enum into table_name '(' column_names_list ')' values parenthesised_expressions_list { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 9, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8, &$9 ); }
-	| REPLACE statement_replace_options_enum into table_name values parenthesised_expressions_list { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 6, &$1, &$2, &$3, &$4, &$5, &$6 ); }
+	REPLACE statement_replace_options_enum into table_name '(' column_names_list ')' values { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 8, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8 ); }
+	| REPLACE statement_replace_options_enum into table_name values { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 5, &$1, &$2, &$3, &$4, &$5 ); }
 	
 	//REPLACE .... SET ...
-	| REPLACE statement_replace_options_enum into table_name SET expressions_list { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 6, &$1, &$2, &$3, &$4, &$5, &$6 ); }
+	| REPLACE statement_replace_options_enum into table_name set { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 5, &$1, &$2, &$3, &$4, &$5 ); }
 	
 	//REPLACE .... SELECT ...:
 	| REPLACE statement_replace_options_enum into table_name '(' column_names_list ')' statement_select_optional_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 8, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8 ); }	
@@ -400,19 +401,22 @@ statement_replace:
 
 	;
 
+set:
+	SET expressions_list { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SET, 2, &$1, &$2) };
+	;
+
 statement_insert:
 	//INSERT ... VALUES (...)
-	INSERT statement_insert_options_enum into table_name partition '(' column_names_list ')' values parenthesised_expressions_list on_duplicate_key_update { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 11, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8, &$9, &$10, &$11 ); }
-	| INSERT statement_insert_options_enum into table_name partition values parenthesised_expressions_list on_duplicate_key_update { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 8, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8 ); }
+	INSERT statement_insert_options_enum into table_name partition '(' column_names_list ')' values on_duplicate_key_update { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 10, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8, &$9, &$10); }
+	| INSERT statement_insert_options_enum into table_name partition values on_duplicate_key_update { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 7, &$1, &$2, &$3, &$4, &$5, &$6, &$7 ); }
 
 	//INSERT ... SELECT
 	| INSERT statement_insert_options_enum into table_name partition '(' column_names_list ')' statement_select_optional_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 9, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8, &$9 ); }
 	| INSERT statement_insert_options_enum into table_name partition statement_select_optional_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 6, &$1, &$2, &$3, &$4, &$5, &$6 ); }
 	
 	//INSERT ... SET ...
-	| INSERT statement_insert_options_enum into table_name partition SET expressions_list on_duplicate_key_update { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 8, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8 ); }
+	| INSERT statement_insert_options_enum into table_name partition set on_duplicate_key_update { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 7, &$1, &$2, &$3, &$4, &$5, &$6, &$7 ); }
 	;
-
 statement_insert_options_enum:
 	{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_INSERT_OPTIONS_LIST,0); }
 	| statement_insert_options_enum		statement_insert_option { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_INSERT_OPTIONS_LIST, 2, &$1, &$2); }
@@ -429,8 +433,8 @@ on_duplicate_key_update:
 	| ON_DUPLICATE_KEY_UPDATE expressions_list { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_ON_DUPLICATE_KEY_UPDATE, 2, &$1, &$2 ); }
 	;
 values:
-	VALUES { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_VALUES, 1, &$1); }
-	| VALUE { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_VALUES, 1, &$1); }
+	VALUES parenthesised_expressions_list { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_VALUES, 2, &$1, &$2); }
+	| VALUE parenthesised_expressions_list { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_VALUES, 2, &$1, &$2); }
 	;
 
 parenthesised_expressions_list:
