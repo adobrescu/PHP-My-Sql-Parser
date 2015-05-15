@@ -48,11 +48,15 @@
 			);
 	echo $parser->rebuildSource().'<br>';
 	
-	return;
-	$query='INSERT INTO tbl (a,b) SELECT \'c\'';
-	$parser->parse($query); 
+	//////////////////////////////////////////////////
+	$query='INSERT INTO tbl 
+		SET field1="string",
+			field2=3.14';
 	
-	$query='INSERT INTO tbl ((SELECT c)) ';
 	$parser->parse($query);
+	$parser->addInsertColumns(
+			array('field3', 'field4'),
+			array('value3', '"value4"')
+			);
+	echo $parser->rebuildSource().'<br>';
 	
-	echo $parser->rebuildSource();
