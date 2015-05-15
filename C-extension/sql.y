@@ -290,19 +290,19 @@ extern char *yytext;
 
 %start statement
 
-
+%glr-parser
+%expect-rr 1
 
 
 %%
 
 statement:
-	statement_union { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
-	| statement_select { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
-	| statement_update { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
-	| statement_delete { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
-	| statement_replace { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
-	| statement_insert { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
-	
+	statement_select_optional_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_SELECT, 1, &$1); add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
+	| statement_update { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_UPDATE, 1, &$1); add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
+	| statement_delete { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_DELETE, 1, &$1); add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
+	| statement_replace { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 1, &$1); add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
+	| statement_insert { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 1, &$1); add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
+	/*
 	| from { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
 	| where { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
 	| group_by { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
@@ -310,22 +310,23 @@ statement:
 	| order_by { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
 	| limit { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
 	| expressions_list { add_assoc_zval(*arr_parser, "parse_tree", $$.token_index);}
+	*/
 	;
 
-
-
-statement_union:
-	statement_union_select UNION_TYPE statement_union_select { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_UNION, 3, &$1, &$2, &$3); }
-	| statement_union UNION_TYPE statement_union_select { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_UNION, 3, &$1, &$2, &$3); }
-	;
-
-//permite SELECT-uri intre paranteze multiple
-statement_union_select: 
-	statement_select { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_SELECT, 1, &$1); }
-	| '(' statement_union_select ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_UNION_SELECT, 3, &$1, &$2, &$3); }
+statement_select_optional_union:
+	statement_select { $$=$1; }
+	| statement_select_optional_union UNION_TYPE statement_select { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_SELECT, 3, &$1, &$2, &$3); }
 	;
 statement_select:
+	statement_simple_select { $$=$1; }
+	| '(' statement_select_optional_union ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_SELECT, 3, &$1, &$2, &$3); }
+	;
+statement_simple_select:
 	SELECT	statement_select_options_enum	statement_select_expressions_list from_optional where_optional group_by_optional having_optional order_by_optional limit_optional procedure into_export_options select_type { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_SELECT, 12, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8, &$9, &$10, &$11, &$12); }
+	;
+subselect:
+	'(' statement_select_optional_union ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SUBSELECT, 3, &$1, &$2, &$3); }
+	
 	;
 statement_select_options_enum:
 	{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_OPTIONS_LIST,0); }
@@ -394,10 +395,9 @@ statement_replace:
 	| REPLACE statement_replace_options_enum into table_name SET expressions_list { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 6, &$1, &$2, &$3, &$4, &$5, &$6 ); }
 	
 	//REPLACE .... SELECT ...:
-	| REPLACE statement_replace_options_enum into table_name '(' column_names_list ')' statement_select { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 8, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8 ); }
-	| REPLACE statement_replace_options_enum into table_name '(' column_names_list ')' statement_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 8, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8 ); }
-	| REPLACE statement_replace_options_enum into table_name  statement_select { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 5, &$1, &$2, &$3, &$4, &$5 ); }
-	| REPLACE statement_replace_options_enum into table_name  statement_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 5, &$1, &$2, &$3, &$4, &$5 ); }
+	| REPLACE statement_replace_options_enum into table_name '(' column_names_list ')' statement_select_optional_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 8, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8 ); }	
+	| REPLACE statement_replace_options_enum into table_name  statement_select_optional_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_REPLACE, 5, &$1, &$2, &$3, &$4, &$5 ); }
+
 	;
 
 statement_insert:
@@ -406,10 +406,8 @@ statement_insert:
 	| INSERT statement_insert_options_enum into table_name partition values parenthesised_expressions_list on_duplicate_key_update { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 8, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8 ); }
 
 	//INSERT ... SELECT
-	| INSERT statement_insert_options_enum into table_name partition '(' column_names_list ')' statement_select { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 9, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8, &$9 ); }
-	| INSERT statement_insert_options_enum into table_name partition '(' column_names_list ')' statement_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 9, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8, &$9 ); }
-	| INSERT statement_insert_options_enum into table_name partition statement_select { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 6, &$1, &$2, &$3, &$4, &$5, &$6 ); }
-	| INSERT statement_insert_options_enum into table_name partition statement_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 6, &$1, &$2, &$3, &$4, &$5, &$6 ); }
+	| INSERT statement_insert_options_enum into table_name partition '(' column_names_list ')' statement_select_optional_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 9, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8, &$9 ); }
+	| INSERT statement_insert_options_enum into table_name partition statement_select_optional_union { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 6, &$1, &$2, &$3, &$4, &$5, &$6 ); }
 	
 	//INSERT ... SET ...
 	| INSERT statement_insert_options_enum into table_name partition SET expressions_list on_duplicate_key_update { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_INSERT, 8, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8 ); }
@@ -436,8 +434,8 @@ values:
 	;
 
 parenthesised_expressions_list:
-	'(' ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR_LIST2, 2, &$1, &$2 ); }
-	| '(' expressions_list ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR_LIST2, 3, &$1, &$2, &$3 ); }
+	'(' ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR_LIST2, 2, &$1, &$2 ); }
+	| '(' expressions_list ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR_LIST2, 3, &$1, &$2, &$3 ); }
 	;
 
 column_names_list:
@@ -488,9 +486,9 @@ table_factor:
 	table_name index_hint						{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 2, &$1, &$2 ); }
 	| table_name ID	 index_hint					{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 3, &$1, &$2, &$3 ); }
 	| table_name AS ID  index_hint			{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR,4, &$1, &$2, &$3,&$4 ); }
-	| subquery  { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 1, &$1); }
-	| subquery ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 2, &$1, &$2 ); }
-	| subquery AS ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 3, &$1, &$2, &$3 ); }
+	| subselect  { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 1, &$1); }
+	| subselect ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 2, &$1, &$2 ); }
+	| subselect AS ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 3, &$1, &$2, &$3 ); }
 	| '(' table_references ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 3, &$1, &$2, &$3 ); }
 	
 	
@@ -548,9 +546,7 @@ expressions_list:
 	expression { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR_LIST, 1, &$1); }
 	| expressions_list ',' expression { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR_LIST, 3, &$1, &$2, &$3); }
 	;
-subquery:
-	'(' statement_select ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SUBSELECT, 3, &$1, &$2, &$3); }
-	;
+
 column_reference:
 	ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_COLUMN_NAME, 1, &$1); }
 	| ID '.' ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_COLUMN_NAME, 3, &$1, &$2, &$3); }
@@ -592,16 +588,16 @@ expression:
 	| expression OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST '(' expressions_list ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 5, &$1, &$2, &$3, &$4, &$5); }
 	
 	//expression IN (SELECT ...)
-	| expression OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST subquery { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 3, &$1, &$2, &$3); }
+	| expression OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST subselect { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 3, &$1, &$2, &$3); }
 
 	// expression NOT IN ( expression, expression, ...) - expression poate fi un subselect (SELECT ...)
 	| expression OPERATOR_1_OPERANDS OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST '(' expressions_list ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 6, &$1, &$2, &$3, &$4, &$5, &$6); }
 
 	//expression NOT IN (SELECT ...)
-	| expression OPERATOR_1_OPERANDS OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST subquery { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 4, &$1, &$2, &$3, &$4); }
+	| expression OPERATOR_1_OPERANDS OPERATOR_EXPRESSION_2_EXPRESSIONS_LIST subselect { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 4, &$1, &$2, &$3, &$4); }
 
 	| '(' expression ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 3, &$1, &$2, &$3); }
-	| subquery { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 1, &$1); }
+	| subselect { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR, 1, &$1); }
 	
 	//FUNCTION()
 	//no arguments
