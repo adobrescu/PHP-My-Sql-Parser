@@ -325,6 +325,12 @@ statement_select:
 statement_simple_select:
 	SELECT	statement_select_options_enum	statement_select_expressions_list from_optional where_optional group_by_optional having_optional order_by_optional limit_optional procedure into_export_options select_type { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_STATEMENT_SELECT, 12, &$1, &$2, &$3, &$4, &$5, &$6, &$7, &$8, &$9, &$10, &$11, &$12); }
 	;
+
+/*
+subselect genereaza un conflict reduce/reduce;
+Daca in loc de statement_select_optional_union se foloseste statement_simple_select, eroarea dispare
+Daca in loc de statement_select_optional_union se foloseste  statement_select, eroarea devine shift/reduce
+*/
 subselect:
 	'(' statement_select_optional_union ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SUBSELECT, 3, &$1, &$2, &$3); }
 	
