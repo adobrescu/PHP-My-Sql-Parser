@@ -102,6 +102,7 @@ class SqlParser
 	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_LINES=10072;
 	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_LIST=10073;
 	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_OPTION=10074;
+	const PHP_SQL_SET=10075;
 	/*end codes*/
 	/*regexp used to split sql stamenets in tokens when alsqlp extension is not available*/
 	static protected $___regexpTokens='';
@@ -445,6 +446,15 @@ class SqlParser
 	{
 		$sqlColumnNames=$sqlColumnValues='';
 		
+		if($columnNamesNode=$this->getNodesByType(static::PHP_SQL_SET))
+		{
+			foreach($columnNames as $i=>$columnName)
+			{
+				$sqlColumnNames.=($sqlColumnNames?', ':'').$columnName.'='.$columnValues[$i];
+			}
+			return $this->insertSource(static::PHP_SQL_EXPR_LIST, '', $sqlColumnNames, ',', $replace=false, $encloseWithParanthesis=false, $columnNamesNode);
+		}
+		
 		foreach($columnNames as $i=>$columnName)
 		{
 			$sqlColumnNames.=($sqlColumnNames?', ':'').$columnName;
@@ -457,14 +467,15 @@ class SqlParser
 			$this->parse($this->rebuildSource());
 		}
 		
-		if($columnNamesNode=&$this->getNodesByType(static::PHP_SQL_EXPR_LIST2)[0])
+		if($columnNamesNode=&$this->getNodesByType(static::PHP_SQL_VALUES)[0])
 		{
-			$this->insertSource(static::PHP_SQL_EXPR_LIST, '', $sqlColumnValues, ',', $replace=false, $encloseWithParanthesis=false, $columnNamesNode);
+			return $this->insertSource(static::PHP_SQL_EXPR, '', $sqlColumnValues, ',', $replace=false, $encloseWithParanthesis=false, $columnNamesNode);
 		}
 		elseif($columnNamesNode=&$this->getNodesByType(static::PHP_SQL_STATEMENT_SELECT)[0])	
 		{
-			$this->addSelectColumns($sqlColumnValues, $columnNamesNode);
+			return $this->addSelectColumns($sqlColumnValues, $columnNamesNode);
 		}
+		
 			
 	}
 	public function addSelectColumns($columnNames, &$startNode=null)
