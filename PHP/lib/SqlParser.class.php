@@ -103,6 +103,8 @@ class SqlParser
 	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_LIST=10073;
 	const PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_OPTION=10074;
 	const PHP_SQL_SET=10075;
+	const PHP_SQL_TABLE_FACTOR_ALIAS=10076;
+	const PHP_SQL_EXPR_ALIAS=10077;
 	/*end codes*/
 	/*regexp used to split sql stamenets in tokens when alsqlp extension is not available*/
 	static protected $___regexpTokens='';
@@ -176,7 +178,7 @@ class SqlParser
 		$cacheFileName.='/'.$cacheFileNameParts[$numCacheFilenNameParts-1].'.php';
 		return $cacheFileName;
 	}	
-	public function parse($source, $tokensStartIndex=10)
+	public function parse($source, $tokensStartIndex=0)
 	{
 		
 		if(static::$___useCached || !extension_loaded('alsqlp'))
