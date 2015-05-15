@@ -79,7 +79,7 @@ class SqlParser
 	const PHP_SQL_PARTITION=10050;
 	const PHP_SQL_COLUMN_NAMES_LIST=10051;
 	const PHP_SQL_VALUES=10052;
-	const PHP_SQL_SELECT_EXPR_LIST2=10053; /*with paranthesis eg: (a, 1+100, 1+select '1')*/
+	const PHP_SQL_EXPR_LIST2=10053; /*with paranthesis eg: (a, 1+100, 1+select '1')*/
 	const PHP_SQL_ON_DUPLICATE_KEY_UPDATE=10054;
 	const PHP_SQL_REPLACE_OPTIONS_LIST=10055;
 	const PHP_SQL_REPLACE_OPTION=10056;
@@ -420,8 +420,8 @@ class SqlParser
 		}
 		
 			
-		$rebuiltQuery=$this->rebuildSource();
-		$this->parse($rebuiltQuery);
+		//$rebuiltQuery=$this->rebuildSource();
+		//$this->parse($rebuiltQuery);
 	}
 	public function appendWhere($cond, $operator=null, &$startNode=null)
 	{
@@ -441,7 +441,38 @@ class SqlParser
 		
 		$this->insertSource(static::PHP_SQL_LIMIT, '',	$limit, '', $replace=true, $encloseWithParanthesis=false, $startNode);
 	}
-	
+	public function addInsertColumns($columnNames, $columnValues)
+	{
+		$sqlColumnNames=$sqlColumnValues='';
+		
+		foreach($columnNames as $i=>$columnName)
+		{
+			$sqlColumnNames.=($sqlColumnNames?', ':'').$columnName;
+			$sqlColumnValues.=($sqlColumnValues?', ':'').$columnValues[$i];
+		}
+		
+		if($columnNamesNode=&$this->getNodesByType(static::PHP_SQL_COLUMN_NAMES_LIST)[0])
+		{
+			$this->insertSource(static::PHP_SQL_COLUMN_NAMES_LIST, '', $sqlColumnNames, ',', $replace=false, $encloseWithParanthesis=false);
+			$this->parse($this->rebuildSource());
+		}
+		
+		if($columnNamesNode=&$this->getNodesByType(static::PHP_SQL_EXPR_LIST2)[0])
+		{
+			$this->insertSource(static::PHP_SQL_EXPR_LIST, '', $sqlColumnValues, ',', $replace=false, $encloseWithParanthesis=false, $columnNamesNode);
+		}
+		elseif($columnNamesNode=&$this->getNodesByType(static::PHP_SQL_STATEMENT_SELECT)[0])	
+		{
+			$this->addSelectColumns($sqlColumnValues, $columnNamesNode);
+		}
+			
+	}
+	public function addSelectColumns($columnNames, &$startNode=null)
+	{
+		$node=$this->getNodesByType(static::PHP_SQL_SELECT_EXPR_LIST, $startNode)[0];
+		$this->insertSource(static::PHP_SQL_SELECT_EXPR_LIST, '', $columnNames, ',', $replace=false, $encloseWithParanthesis=false);
+		
+	}
 	public function getTokenTreeNodes($tokenType, &$node=null, $depth=0)
 	{
 		static $nodes;
