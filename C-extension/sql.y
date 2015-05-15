@@ -341,14 +341,16 @@ statement_select_expressions_list:
 	statement_select_expression { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR_LIST, 1, &$1); }
 	| statement_select_expressions_list ',' statement_select_expression { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR_LIST, 3, &$1, &$2, &$3); }
 	;
-
+expression_alias:
+	ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR_ALIAS, 1, &$1); }
+	| STRING { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR_ALIAS, 1, &$1); }
+	| AS ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR_ALIAS, 2, &$1, &$2); }
+	| AS STRING { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_EXPR_ALIAS, 2, &$1, &$2); }
+	;
 statement_select_expression:
 	OP_MUL { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR, 1, &$1); }
 	| expression { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR, 1, &$1); }
-	| expression AS ID	{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR, 3, &$1, &$2, &$3); }
-	| expression ID	{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR, 2, &$1, &$2); }
-	| expression AS STRING	{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR, 3, &$1, &$2, &$3); }
-	| expression STRING	{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR, 2, &$1, &$2); }
+	| expression expression_alias	{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR, 2, &$1, &$2); }
 	| ID '.' OP_MUL { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR, 3, &$1, &$2, &$3); }
 	| ID '.' ID '.' OP_MUL { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR, 5, &$1, &$2, &$3, &$4, &$5); }
 	/*| ID '.' ID '.' ID '.' OP_MUL { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_EXPR, 7, &$1, &$2, &$3, &$4, &$5, &$6, &$7 ); }*/
@@ -488,14 +490,17 @@ join_type:
 	;
 table_factor:
 	table_name index_hint						{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 2, &$1, &$2 ); }
-	| table_name ID	 index_hint					{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 3, &$1, &$2, &$3 ); }
-	| table_name AS ID  index_hint			{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR,4, &$1, &$2, &$3,&$4 ); }
+	| table_name table_factor_alias	 index_hint					{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 3, &$1, &$2, &$3 ); }
 	| subselect  { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 1, &$1); }
-	| subselect ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 2, &$1, &$2 ); }
-	| subselect AS ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 3, &$1, &$2, &$3 ); }
+	| subselect table_factor_alias { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 2, &$1, &$2 ); }
+	
 	| '(' table_references ')' { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR, 3, &$1, &$2, &$3 ); }
 	
-	
+table_factor_alias:
+	ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR_ALIAS, 1, &$1); }
+	| AS ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_FACTOR_ALIAS, 2, &$1, &$2 ); }
+	;
+
 table_name:
 	ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_NAME, 1, &$1); }
 	| ID '.' ID { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_TABLE_NAME, 3, &$1, &$2, &$3 ); }
