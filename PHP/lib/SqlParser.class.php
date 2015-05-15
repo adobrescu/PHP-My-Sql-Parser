@@ -383,7 +383,7 @@ class SqlParser
 			{
 				$childNodeType=substr($childNodeType,0,5);
 
-				if($skipSubqueries && $childNodeType==static::PHP_SQL_SUBSELECT && $findTokenType!=static::PHP_SQL_SUBSELECT)
+				if($skipSubqueries && $childNodeType==static::PHP_SQL_SUBSELECT)
 				{
 					continue;
 				}
