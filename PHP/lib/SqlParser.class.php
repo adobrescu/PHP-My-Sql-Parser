@@ -546,6 +546,53 @@ class SqlParser
 		
 		return $fieldNames;
 	}
+	public function getSelectExpressions($skipSubqueries=true, $startNode=null, $onlyInSelectExprList=true)
+	{
+		if($selectExpressionNodes=$this->getNodesByType(static::PHP_SQL_SELECT_EXPR, $startNode, $skipSubqueries=true, $stopOnFirstMatch=false))
+		{
+			foreach($selectExpressionNodes as $selectExpressionNode)
+			{
+				$alias='';
+				
+				
+				if(isset($selectExpressionNode[static::PHP_SQL_EXPR_ALIAS.'-0']))
+				{
+					//expression with ALIAS
+					//if the ALIAS node has 2 elements then it is as "expr AS alias_name"
+					//if there is only one element then it is an "expr alias_name"
+					$aliasTokenIndex=$selectExpressionNode[static::PHP_SQL_EXPR_ALIAS.'-0'][count($selectExpressionNode[static::PHP_SQL_EXPR_ALIAS.'-0'])==2?1:0];					
+					$alias=$this->tokens[$aliasTokenIndex][0];
+					
+					//remove the ALIAS part from expression
+					unset($selectExpressionNode[static::PHP_SQL_EXPR_ALIAS.'-0']);
+				}
+				elseif(isset($selectExpressionNode[static::PHP_SQL_EXPR.'-0'][static::PHP_SQL_COLUMN_NAME.'-0']))
+				{
+					//the expression doesn't have an ALIAS part end it contains a column name
+					foreach($selectExpressionNode[static::PHP_SQL_EXPR.'-0'][static::PHP_SQL_COLUMN_NAME.'-0'] as $columnNameExpressionTokenIndex)
+					{
+						$alias.=$this->tokens[$columnNameExpressionTokenIndex][0];
+					}
+				}
+				elseif(count($selectExpressionNode)==1)
+				{
+					//the expression contains only one element that is an index poiting to corresponding token
+					$alias=$this->tokens[current($selectExpressionNode)][0];
+				}
+				
+				if($alias)
+				{
+					$selectExpressions[$alias]=$this->rebuildSourceWithRecursiveCalls($selectExpressionNode);
+				}
+				else
+				{
+					$selectExpressions[]=$this->rebuildSourceWithRecursiveCalls($selectExpressionNode);
+				}
+			}
+		}
+		
+		return $selectExpressions;
+	}
 	public function getTableNames($skipSubqueries=true, $startNode=null)
 	{
 		if($tokens=$this->getNodesByType(static::PHP_SQL_TABLE_NAME, $startNode, $skipSubqueries, false))
