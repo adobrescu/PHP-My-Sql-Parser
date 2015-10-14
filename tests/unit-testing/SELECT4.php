@@ -49,9 +49,25 @@ Quisque eu nisi eget libero egestas sagittis. Integer in pharetra felis. Ut dolo
 Vivamus condimentum pellentesque porttitor. Quisque bibendum tincidunt feugiat. In faucibus quam justo, vel lobortis elit accumsan gravida. Praesent mollis eget lacus ac lobortis. Mauris odio neque, malesuada quis urna sed, blandit placerat est. Morbi vel sodales nibh. Aliquam nec quam ac urna sagittis sollicitudin. Praesent velit augue, mollis ac rhoncus eget, pharetra ut lorem. Nullam accumsan auctor tortor. Donec rutrum sollicitudin nisl et dapibus. Fusce nulla odio, consectetur at rhoncus vel, condimentum in nisl. Maecenas in malesuada ligula, nec vehicula dolor. Sed vestibulum auctor tellus. Fusce varius nisl eu dui pellentesque accumsan. Aliquam mollis, nunc ac ornare iaculis, ante lacus ultrices enim, sit amet tincidunt mauris felis quis orci. Curabitur eget massa a lacus tincidunt vestibulum ac id purus. 
 \' from tbl';
 $queries[]='SELECT FOUND_ROWS()';
+$queries[]='SELECT SQL_CALC_FOUND_ROWS  CONCAT(`content_items`.`id_content_item`, `content_items`.`id_content_item`, `content_items_alias_1`.`id_content_item`, `content_items_alias_1`.`id_content_item`, `content_items_alias_2`.`id_content_item`, CONCAT(`content_translations`.`id_content_item`, \'-\', `content_translations`.`lang`), CONCAT(`content_translations`.`id_content_item`, \'-\', `content_translations`.`lang`)) AS ____PATH____, 
+	`content_translations`.* 
+FROM `content_items` INNER JOIN `content_items` AS content_items_alias_1
+	ON `content_items`.`id_content_item`=`content_items_alias_1`.`parent_id_content_item`
+INNER JOIN `content_items` AS content_items_alias_2
+	ON `content_items_alias_1`.`id_content_item`=`content_items_alias_2`.`parent_id_content_item`
+INNER JOIN `content_translations`
+	ON `content_items_alias_2`.`id_content_item`=`content_translations`.`id_content_item`
+
+WHERE CONCAT(`content_items`.`id_content_item`) IN (1) AND (content_translations.lang=\'en\')';
+
+$queries[]='SELECT \'\\\\\'';
+$queries[]='SELECT "\\\\"';
+echo 'SELECT "\\\\"';
+//echo $queries2; die();
 foreach ($queries as $query)
 {
 	//print_r(parseSqlQuery($query));
 	testQuery($query);
 
 }
+

@@ -13,8 +13,8 @@ extern make_token ( YYSTYPE*, char*, int, int );
 %x string dbl_string line_comment comment
 
 /*strings*/
-SINGLE_QUOTED_STRING_CHR			[^']|\\'
-DOUBLE_QUOTED_STRING_CHR		[^\"]|\\\"
+SINGLE_QUOTED_STRING_CHR			[^'\\]|\\'|\\\\
+DOUBLE_QUOTED_STRING_CHR		[^\"\\]|\\\"|\\\\
 QUOTED_ID_CHR		[^\`]
 LINE_COMMENT_CHR	[^\r\n]
 COMMENT_CHR			[^\*]|[\*][^\/]
@@ -72,7 +72,7 @@ OP_ATTR					\:\=
 
 
 
-ID						[a-z][a-z0-9_]*
+ID						[a-z_][a-z0-9_]*
 BACKQUOTED_ID			`[a-z][a-z0-9_]*`
 
 WHITESPACE				[ \t\n\r]
