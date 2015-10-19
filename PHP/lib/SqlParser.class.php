@@ -21,7 +21,7 @@ const TOKEN_TYPE_OPERATOR='P';
 
 class SqlParser
 {
-	public static $___useCached=false;
+	public static $___useCached=true;
 	protected $tokens, $parseTree;
 	
 	protected static $___keywords=array('ACCESSIBLE', 'ADD', 'ALL', 'ALTER', 'ANALYZE', 'AND', 'AS', 'ASC', 'ASENSITIVE', 'BEFORE', 'BETWEEN', 'BIGINT', 'BINARY', 'BLOB', 'BOTH', 'BY', 'CALL', 'CASCADE', 'CASE', 'CHANGE', 'CHAR', 'CHARACTER', 'CHECK', 'COLLATE', 'COLUMN', 'CONDITION', 'CONSTRAINT', 'CONTINUE', 'CONVERT', 'CREATE', 'CROSS', 'CURRENT_DATE', 'CURRENT_TIME', 'CURRENT_TIMESTAMP', 'CURRENT_USER', 'CURSOR', 'DATABASE', 'DATABASES', 'DAY_HOUR', 'DAY_MICROSECOND', 'DAY_MINUTE', 'DAY_SECOND', 'DEC', 'DECIMAL', 'DECLARE', 'DEFAULT', 'DELAYED', 'DELETE', 'DESC', 'DESCRIBE', 'DETERMINISTIC', 'DISTINCT', 'DISTINCTROW', 'DIV', 'DOUBLE', 'DROP', 'DUAL', 'EACH', 'ELSE', 'ELSEIF', 'ENCLOSED', 'ESCAPED', 'EXISTS', 'EXIT', 'EXPLAIN', 'FALSE', 'FETCH', 'FLOAT', 'FLOAT4', 'FLOAT8', 'FOR', 'FORCE', 'FOREIGN', 'FROM', 'FULLTEXT', 'GET', 'GRANT', 'GROUP', 'HAVING', 'HIGH_PRIORITY', 'HOUR_MICROSECOND', 'HOUR_MINUTE', 'HOUR_SECOND', 'IF', 'IGNORE', 'IN', 'INDEX', 'INFILE', 'INNER', 'INOUT', 'INSENSITIVE', 'INSERT', 'INT', 'INT1', 'INT2', 'INT3', 'INT4', 'INT8', 'INTEGER', 'INTERVAL', 'INTO', 'IO_AFTER_GTIDS', 'IO_BEFORE_GTIDS', 'IS', 'ITERATE', 'JOIN', 'KEY', 'KEYS', 'KILL', 'LEADING', 'LEAVE', 'LEFT', 'LIKE', 'LIMIT', 'LINEAR', 'LINES', 'LOAD', 'LOCALTIME', 'LOCALTIMESTAMP', 'LOCK', 'LONG', 'LONGBLOB', 'LONGTEXT', 'LOOP', 'LOW_PRIORITY', 'MASTER_BIND', 'MASTER_SSL_VERIFY_SERVER_CERT', 'MATCH', 'MAXVALUE', 'MEDIUMBLOB', 'MEDIUMINT', 'MEDIUMTEXT', 'MIDDLEINT	MINUTE_MICROSECOND', 'MINUTE_SECOND', 'MOD', 'MODIFIES', 'NATURAL', 'NOT', 'NO_WRITE_TO_BINLOG', 'NULL', 'NUMERIC', 'ON', 'OPTIMIZE', 'OPTION', 'OPTIONALLY', 'OR', 'ORDER', 'OUT', 'OUTER', 'OUTFILE', 'PARTITION', 'PRECISION', 'PRIMARY', 'PROCEDURE', 'PURGE', 'RANGE', 'READ', 'READS', 'READ_WRITE', 'REAL', 'REFERENCES', 'REGEXP', 'RELEASE', 'RENAME', 'REPEAT', 'REPLACE', 'REQUIRE', 'RESIGNAL', 'RESTRICT', 'RETURN', 'REVOKE', 'RIGHT', 'RLIKE', 'SCHEMA', 'SCHEMAS', 'SECOND_MICROSECOND', 'SELECT', 'SENSITIVE', 'SEPARATOR', 'SET', 'SHOW', 'SIGNAL', 'SMALLINT', 'SPATIAL', 'SPECIFIC', 'SQL', 'SQLEXCEPTION', 'SQLSTATE', 'SQLWARNING', 'SQL_BIG_RESULT', 'SQL_CALC_FOUND_ROWS', 'SQL_SMALL_RESULT', 'SSL', 'STARTING', 'STRAIGHT_JOIN', 'TABLE', 'TERMINATED', 'THEN', 'TINYBLOB', 'TINYINT', 'TINYTEXT', 'TO', 'TRAILING', 'TRIGGER', 'TRUE', 'UNDO', 'UNION', 'UNIQUE', 'UNLOCK', 'UNSIGNED', 'UPDATE', 'USAGE', 'USE', 'USING', 'UTC_DATE', 'UTC_TIME', 'UTC_TIMESTAMP', 'VALUES', 'VARBINARY', 'VARCHAR', 'VARCHARACTER', 'VARYING', 'WHEN', 'WHERE', 'WHILE', 'WITH', 'WRITE', 'XOR', 'YEAR_MONTH', 'ZEROFILL'		);
@@ -109,7 +109,40 @@ class SqlParser
 	/*regexp used to split sql stamenets in tokens when alsqlp extension is not available*/
 	static protected $___regexpTokens='';
 	static protected $___regexpTokenDefs=array(
-		/*string*/			1 =>'(((?<![\\\])[\'"])((?:.(?!(?<![\\\])\2))*.?)(\2))',
+		/*string*/			1 =>'(
+									(										
+										["] #match single or double quote not preceded by a backslash
+									)
+									(
+										(?:
+											\\\"
+											|
+											""
+											|
+											[^"]
+										)*
+									)
+									(")
+									|
+									(										
+										[\'] #match single or double quote not preceded by a backslash
+									)
+									(
+										(?:
+											\\\\\\\\
+											|
+											\\\\\'
+											|
+											\'\'
+											|
+											[^\']
+										)*
+									)
+									(\')
+									
+								)
+								
+								',
 		/*parameter*/		2 => '(\@[a-z\_][a-z\_0-9]*)',
 		/*backquoted_id*/	3 => '(`[a-z\_][a-z\_0-9\\s]*`)',
 		/*join type*/		
@@ -123,24 +156,24 @@ class SqlParser
 		/*union*/			100 => '(UNION[\\s]+DISTINCT|UNION[\\s]+ALL|UNION)',
 		/*select type*/		45 => '(LOCK[\\s]+IN[\\s]+SHARE[\\s]+MODE|FOR[\\s]+UPDATE)',
 		/*hex_number*/		5 => '([xb]\'[0-9a-z]+\')',
-		/*id*/				6 => '([a-z][a-z0-9\_]*)',
+		/*id*/				6 => '([a-z\_][a-z0-9\_]*)',
 		/*number*/			7 => '([0-9]*[\.]{0,1}[0-9]*e[\+\-][0-9]+|[0-9]*[.][0-9]+|0x[0-9a-z]+|[0-9]+)',
 		/*operator*/		8 => '(\:\=|\|\||\&\&|\!\=|\/|\%|\=|\<\=\>|\>\=|\<\<|\>\>|\<\>|\<\=|\<|\>|\||\&|\^|\+|\-|\~|\*|\(|\)|\,|\.)'
 			);
 	static protected $___regexpTokenTypes=array(
 		/*string*/			1=> TOKEN_TYPE_STRING,
-		/*parameter*/		5 => TOKEN_TYPE_PARAMETER, 
-		/*backquoted_id*/	6 => TOKEN_TYPE_BACKQUOTED_ID,
-		/*join type*/		7 => TOKEN_JOIN_TYPE,
-		/*join index hint*/	8 => TOKEN_JOIN_INDEX_HINT,
-		/*keyword*/			9 => TOKEN_TYPE_KEYWORD, 
-		/*export options*/	10 => TOKEN_TYPE_EXPORT_OPTIONS,
-		/*union*/			11 => TOKEN_TYPE_UNION,
-		/*select type*/		12 => TOKEN_TYPE_SELECT_TYPE,
-		/*hex_number*/		13 => TOKEN_TYPE_HEX_NUMBER,
-		/*id*/				14 => TOKEN_TYPE_ID, 
-		/*number*/			15 => TOKEN_TYPE_NUMBER, 
-		/*operator*/		16 => TOKEN_TYPE_OPERATOR
+		/*parameter*/		8 => TOKEN_TYPE_PARAMETER, 
+		/*backquoted_id*/	9 => TOKEN_TYPE_BACKQUOTED_ID,
+		/*join type*/		10 => TOKEN_JOIN_TYPE,
+		/*join index hint*/	11 => TOKEN_JOIN_INDEX_HINT,
+		/*keyword*/			12 => TOKEN_TYPE_KEYWORD, 
+		/*export options*/	13 => TOKEN_TYPE_EXPORT_OPTIONS,
+		/*union*/			14 => TOKEN_TYPE_UNION,
+		/*select type*/		15 => TOKEN_TYPE_SELECT_TYPE,
+		/*hex_number*/		16 => TOKEN_TYPE_HEX_NUMBER,
+		/*id*/				17 => TOKEN_TYPE_ID, 
+		/*number*/			18 => TOKEN_TYPE_NUMBER, 
+		/*operator*/		19 => TOKEN_TYPE_OPERATOR
 		);
 	static public function ___getKeywords()
 	{
@@ -156,7 +189,7 @@ class SqlParser
 		}
 		
 		$cacheFileNameParts=str_split($sourceCode, 250);
-		$cacheFileName=CACHE_DIR.'/sql-parse-trees';
+		$cacheFileName=CONFIG_CACHE_DIR.'/sql-parse-trees';
 		
 		if(!is_dir($cacheFileName))
 		{
@@ -308,7 +341,7 @@ class SqlParser
 			static::___buildRegexpTokens();
 		}
 		
-		if(preg_match_all('/'.static::$___regexpTokens.'/is', $source, $matches, PREG_PATTERN_ORDER)>0)
+		if(preg_match_all('/'.static::$___regexpTokens.'/xis', $source, $matches, PREG_PATTERN_ORDER)>0)
 		{
 			if($debug)
 			{

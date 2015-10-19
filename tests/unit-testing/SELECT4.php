@@ -36,6 +36,7 @@ $queries[]='SELECT a UNION SELECT b UNION (select a from b left join c using(id)
 $queries[]='SELECT a UNION SELECT b UNION (select a from b left join c using(id)) UNION ALL ((((select b)))) union distinct select "a"';
 
 $queries[]='select  (select 1) union distinct  (select 1)';
+
 $queries[]='select \'
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce cursus est nisi, in ornare nisl varius vel. Aenean venenatis odio vel arcu mollis, eu aliquam diam viverra. Nam feugiat odio eget aliquam luctus. Aenean imperdiet libero nec augue vehicula, eu varius est adipiscing. Duis hendrerit augue in nunc ultrices tempor. Nunc et mattis tellus, eu viverra lorem. In sagittis lobortis augue, eget consectetur augue volutpat a. Phasellus elit arcu, pellentesque sed ante nec, ullamcorper pretium purus. Sed lorem enim, mollis non turpis a, feugiat rutrum nulla. Proin ac erat quis erat vulputate porta. Cras venenatis, arcu ut rutrum varius, nibh nunc varius mauris, eget varius sem sapien nec leo. Pellentesque laoreet arcu dignissim, pharetra ante vel, viverra nunc. Curabitur tellus mi, aliquam et augue vitae, lobortis vestibulum lacus. Proin facilisis vestibulum nibh, vitae molestie metus dignissim vitae. Morbi vel tellus sit amet tellus pulvinar porttitor non id elit. Duis eget facilisis urna.
@@ -48,8 +49,11 @@ Quisque eu nisi eget libero egestas sagittis. Integer in pharetra felis. Ut dolo
 
 Vivamus condimentum pellentesque porttitor. Quisque bibendum tincidunt feugiat. In faucibus quam justo, vel lobortis elit accumsan gravida. Praesent mollis eget lacus ac lobortis. Mauris odio neque, malesuada quis urna sed, blandit placerat est. Morbi vel sodales nibh. Aliquam nec quam ac urna sagittis sollicitudin. Praesent velit augue, mollis ac rhoncus eget, pharetra ut lorem. Nullam accumsan auctor tortor. Donec rutrum sollicitudin nisl et dapibus. Fusce nulla odio, consectetur at rhoncus vel, condimentum in nisl. Maecenas in malesuada ligula, nec vehicula dolor. Sed vestibulum auctor tellus. Fusce varius nisl eu dui pellentesque accumsan. Aliquam mollis, nunc ac ornare iaculis, ante lacus ultrices enim, sit amet tincidunt mauris felis quis orci. Curabitur eget massa a lacus tincidunt vestibulum ac id purus. 
 \' from tbl';
+
 $queries[]='SELECT FOUND_ROWS()';
-$queries[]='SELECT SQL_CALC_FOUND_ROWS  CONCAT(`content_items`.`id_content_item`, `content_items`.`id_content_item`, `content_items_alias_1`.`id_content_item`, `content_items_alias_1`.`id_content_item`, `content_items_alias_2`.`id_content_item`, CONCAT(`content_translations`.`id_content_item`, \'-\', `content_translations`.`lang`), CONCAT(`content_translations`.`id_content_item`, \'-\', `content_translations`.`lang`)) AS ____PATH____, 
+$queries[]='SELECT SQL_CALC_FOUND_ROWS  CONCAT(`content_items`.`id_content_item`, `content_items`.`id_content_item`, `content_items_alias_1`.`id_content_item`, 
+	`content_items_alias_1`.`id_content_item`, `content_items_alias_2`.`id_content_item`, CONCAT(`content_translations`.`id_content_item`, 
+	`content_translations`.`lang`), CONCAT(`content_translations`.`id_content_item`, \'-\', `content_translations`.`lang`)) AS ____PATH____, 
 	`content_translations`.* 
 FROM `content_items` INNER JOIN `content_items` AS content_items_alias_1
 	ON `content_items`.`id_content_item`=`content_items_alias_1`.`parent_id_content_item`
@@ -60,10 +64,34 @@ INNER JOIN `content_translations`
 
 WHERE CONCAT(`content_items`.`id_content_item`) IN (1) AND (content_translations.lang=\'en\')';
 
-$queries[]='SELECT \'\\\\\'';
-$queries[]='SELECT "\\\\"';
-echo 'SELECT "\\\\"';
+//$queries[]="SELECT '\\\\', 'a'";
+$queries[]="SELECT ' axxa'";
+
+/*$queries[]='SELECT "\\\\"';
+$queries[]='SELECT SQL_CALC_FOUND_ROWS  CONCAT(`users`.`id_user`, `content_items`.`id_content_item`, \'\\\\\', CONCAT(`content_translations`.`id_content_item`, \'-\', `content_translations`.`lang`)) AS ____PATH____, 
+	`content_translations`.* 
+FROM `users` INNER JOIN `content_items`
+	ON `users`.`id_user`=`content_items`.`id_user`
+INNER JOIN `content_translations`
+	ON `content_items`.`id_content_item`=`content_translations`.`id_content_item`
+
+WHERE CONCAT(`users`.`id_user`) IN (1)';
+ * 
+ */
 //echo $queries2; die();
+$queries[]="SELECT ''' oaresce \\'";
+$queries[]='SELECT """"';
+$queries[]="SELECT '\\\\', 'a'";
+$queries[]="SELECT SQL_CALC_FOUND_ROWS  CONCAT(`users`.`id_user`, '\\\\', `content_items`.`id_content_item`, '\\\\', 
+	CONCAT(`content_translations`.`id_content_item`, '-', `content_translations`.`lang`)) AS ____PATH____, 
+	`content_translations`.* 
+FROM `users` INNER JOIN `content_items`
+	ON `users`.`id_user`=`content_items`.`id_user`
+INNER JOIN `content_translations`
+	ON `content_items`.`id_content_item`=`content_translations`.`id_content_item`
+
+WHERE CONCAT(`users`.`id_user`) IN (1)";
+		
 foreach ($queries as $query)
 {
 	//print_r(parseSqlQuery($query));
