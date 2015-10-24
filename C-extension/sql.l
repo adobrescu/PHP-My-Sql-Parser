@@ -76,7 +76,10 @@ ID						[a-z_][a-z0-9_]*
 BACKQUOTED_ID			`[a-z][a-z0-9_]*`
 
 WHITESPACE				[ \t\n\r]
-
+/* 
+IF						{ return make_token(&yylval, yytext, IF, 0); } 
+COLUMNS { return make_token(&yylval, yytext, COLUMNS, 0); }
+*/
 %%
 
 [']						{ BEGIN(string); yymore(); }
@@ -191,7 +194,7 @@ HIGH_PRIORITY						{ return make_token(&yylval, yytext, HIGH_PRIORITY, 0); }
 HOUR_MICROSECOND						{ return make_token(&yylval, yytext, HOUR_MICROSECOND, 0); }
 HOUR_MINUTE						{ return make_token(&yylval, yytext, HOUR_MINUTE, 0); }
 HOUR_SECOND						{ return make_token(&yylval, yytext, HOUR_SECOND, 0); }
-IF						{ return make_token(&yylval, yytext, IF, 0); }
+
 IGNORE						{ return make_token(&yylval, yytext, IGNORE, 0); }
 
 INDEX						{ return make_token(&yylval, yytext, INDEX, 0); }
@@ -352,7 +355,7 @@ INTO{WHITESPACE}+DUMPFILE { return make_token(&yylval, yytext, INTO, 0); }
 INTO { return make_token(&yylval, yytext, INTO, 0); }
 
 FIELDS { return make_token(&yylval, yytext, FIELDS, 0); }
-COLUMNS { return make_token(&yylval, yytext, COLUMNS, 0); }
+
 
 UNION { return make_token(&yylval, yytext, UNION_TYPE, 0); }
 UNION{WHITESPACE}+ALL { return make_token(&yylval, yytext, UNION_TYPE, 0); }

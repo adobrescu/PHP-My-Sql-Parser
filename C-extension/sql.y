@@ -109,7 +109,7 @@ extern char *yytext;
 %token						HOUR_MICROSECOND
 %token						HOUR_MINUTE
 %token						HOUR_SECOND
-%token						IF
+/*%token						IF*/
 %token						IGNORE
 
 %token						INDEX
@@ -259,7 +259,7 @@ extern char *yytext;
 %token						ON_DUPLICATE_KEY_UPDATE
 %token						QUICK
 %token						FIELDS
-%token						COLUMNS
+/*%token						COLUMNS*/
 %token						ORDER_BY
 %token						GROUP_BY
 %token						EXPORT_OPTION
@@ -686,7 +686,11 @@ export_options:
 export_options_fields:
 	{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_FIELDS,0); }
 	| FIELDS export_options_list { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_FIELDS, 2, &$1, &$2 ); }
-	| COLUMNS export_options_list { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_FIELDS, 2, &$1, &$2 ); };
+/*
+	@fixme ID-ul de mai jos inlocuieste tokenul COLUMNS care este comentat si mai sus si si in sql.l
+	Ideea e c anu functionau queryuri pe information_schema.COLUMNS
+*/
+	| ID export_options_list { eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_FIELDS, 2, &$1, &$2 ); };
 	;
 export_options_lines:
 	{ eval_rule(&$$, EVAL_ADD_EMPTY_TOKENS, PHP_SQL_SELECT_INTO_EXPORT_OPTIONS_LINES,0); }
