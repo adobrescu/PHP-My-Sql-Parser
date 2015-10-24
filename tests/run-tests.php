@@ -6,7 +6,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 
 
-define('CACHE_DIR', __DIR__.'/cache');
+define('CONFIG_CACHE_DIR', __DIR__.'/cache');
 
 echo '<pre>';
 
