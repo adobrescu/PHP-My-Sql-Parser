@@ -144,7 +144,7 @@ class SqlParser
 								
 								',
 		/*parameter*/		2 => '(\@[a-z\_][a-z\_0-9]*)',
-		/*backquoted_id*/	3 => '(`[a-z\_][a-z\_0-9\\s]*`)',
+		/*backquoted_id*/	3 => '(`(?:[^`]|``)*`)',
 		/*join type*/		
 							//50 => '(NATURAL[\\s]+OUTER[\\s]+JOIN|STRAIGHT_JOIN|INNER[\\s]+JOIN|CROSS[\\s]+JOIN|LEFT[\\s]+JOIN|LEFT[\\s]+OUTER[\\s]+JOIN|RIGHT[\\s]+OUTER[\\s]+JOIN|RIGHT[\\s]+JOIN|NATURAL[\\s]+LEFT[\\s]+OUTER[\\s]+JOIN|NATURAL[\\s]+LEFT[\\s]+JOIN|NATURAL[\\s]+JOIN|NATURAL[\\s]+RIGHT[\\s]+OUTER[\\s]+JOIN|NATURAL[\\s]+RIGHT[\\s]+JOIN)',
 							50 => '(STRAIGHT_JOIN|(?:NATURAL[\\s]+|)(?:LEFT[\\s]+|RIGHT[\\s]+|INNER[\\s]+|CROSS[\\s]+|)(?:OUTER[\\s]+|)JOIN)',
@@ -213,7 +213,6 @@ class SqlParser
 	}	
 	public function parse($source, $tokensStartIndex=0)
 	{
-		
 		if(static::$___useCached || !extension_loaded('alsqlp'))
 		{
 			$this->parseTokens($source);
