@@ -79,8 +79,9 @@ WHERE CONCAT(`users`.`id_user`) IN (1)';
  * 
  */
 //echo $queries2; die();
-$queries[]="SELECT ''' oaresce \\'";
-$queries[]='SELECT """"';
+$queries[]="SELECT ''' oaresce \\\\'";
+$queries[]='SELECT """asas\""';
+$queries[]="SELECT '\a'";
 $queries[]="SELECT '\\\\', 'a'";
 $queries[]="SELECT SQL_CALC_FOUND_ROWS  CONCAT(`users`.`id_user`, '\\\\', `content_items`.`id_content_item`, '\\\\', 
 	CONCAT(`content_translations`.`id_content_item`, '-', `content_translations`.`lang`)) AS ____PATH____, 
@@ -91,7 +92,7 @@ INNER JOIN `content_translations`
 	ON `content_items`.`id_content_item`=`content_translations`.`id_content_item`
 
 WHERE CONCAT(`users`.`id_user`) IN (1)";
-$queries=array('SELECT SUBSTR(
+$queries[]='SELECT SUBSTR(
 							information_schema.INNODB_SYS_TABLES.NAME, 
 							LOCATE(\'/\', information_schema.INNODB_SYS_TABLES.NAME)
 							+1) AS table_name, 
@@ -112,9 +113,10 @@ $queries=array('SELECT SUBSTR(
 					AND ( information_schema.INNODB_SYS_INDEXES.TYPE=3 OR information_schema.INNODB_SYS_INDEXES.TYPE=2)
 					
 				GROUP BY information_schema.INNODB_SYS_TABLES.NAME, index_name
-				HAVING index_is_nullable=0');	
-$queries2=array('SELECT IF(COLUMNS,1,0) AS index_is_nullable
-					');	
+				HAVING index_is_nullable=0';	
+$queries[]='SELECT IF(COLUMNS,1,0) AS index_is_nullable';
+$queries[]="SELECT 'oaresce '  AS `asas \\ `` axxa `";
+//$queries[]="SELECT 'oaresce '  AS `asas`` `";
 foreach ($queries as $query)
 {
 	//print_r(parseSqlQuery($query));
