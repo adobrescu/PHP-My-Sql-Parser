@@ -13,7 +13,7 @@ extern make_token ( YYSTYPE*, char*, int, int );
 %x string dbl_string line_comment comment
 
 /*strings*/
-SINGLE_QUOTED_STRING_CHR			[^'\\]|\\'|\\\\
+SINGLE_QUOTED_STRING_CHR			[^'\\]|\\.|''
 DOUBLE_QUOTED_STRING_CHR		[^\"\\]|\\\"|\\\\
 QUOTED_ID_CHR		[^\`]
 LINE_COMMENT_CHR	[^\r\n]
